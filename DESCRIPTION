@@ -1,0 +1,50 @@
+Package: languagePredictR
+Type: Package
+Title: Predict Outcomes from Natural Language
+Version: 0.1.0
+Authors@R: as.person(c("Nathan Anderson <anderson.n@wustl.edu> [aut, cre]"))
+Description: This package uses natural language responses
+    to predict binary and continuous outcome variables.
+    Regression models regularized with a LASSO constraint
+    identify word choices that are predictive of desired
+    outcomes, with options to plot various useful metrics.
+License: GPL-3
+Depends: R (>= 4.0.0)
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr,
+    textclean,
+    hunspell,
+    readr,
+    ggplot2,
+    stringr,
+    tidyr,
+    stringdist,
+    tuneR,
+    evobiR,
+    lubridate,
+    zoo,
+    data.table,
+    stats,
+    tm,
+    glmnet,
+    quanteda,
+    gridExtra,
+    pROC,
+    koRpus,
+    koRpus.lang.en,
+    reshape2,
+    scales,
+    rlist,
+    egg,
+    grid,
+    tidyverse,
+    pbapply,
+    progress,
+    grDevices,
+    graphics,
+    rlang,
+    tibble,
+    methods
+RoxygenNote: 7.1.1
