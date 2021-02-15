@@ -1,15 +1,12 @@
 ---
-title: "vignette"
-author: "Nathan Anderson"
-date: "2/15/2021"
 output: github_document
 ---
 
-This packge implements the analysis described in Dobbins & Kantner 2019. It is intended to quantitatively assess natural language produced by participants, and use language choices to predict binary or continuous outcomes on a given measure.
+This package implements the analysis described in Dobbins & Kantner 2019. It is intended to quantitatively assess natural language produced by participants, and use language choices to predict binary or continuous outcomes on a given measure.
 
 To install:
 
-```{r}
+```{r, echo=FALSE}
 # install.packages("devtools")
 devtools::install_github("nlanderson9/languagePredictR")
 ```
@@ -65,7 +62,7 @@ This is done using the language_model function, the core function of this packag
 
 All you need to specify is the outcome variable (in this case, we're using language choice to predict whether the review is Positive or Negative) and what type the outcome variable is (here, a binary variable)
 
-```{r}
+```{r, echo=FALSE}
 movie_model_strong = language_model(strong_movie_review_data,
                                       outcomeVariableColumnName = "valence",
                                       outcomeVariableType = "binary",
@@ -77,7 +74,7 @@ movie_model_strong = language_model(strong_movie_review_data,
 There's not much we can do with this model output without assessing it. When we assess the model, we can do so in conjunction with other models in order to compare them.
 Let's compare our model with one based on another dataset: mild_movie_review_data. This dataset is very similar, except these reviews are more "mild" (4 and 7, instead of 1 and 10). Maybe people use stronger, and more predictive, language for stronger reviews?
 
-```{r}
+```{r, echo=FALSE}
 mild_movie_review_data$cleanText = clean_text(mild_movie_review_data$text)
 movie_model_mild = language_model(mild_movie_review_data,
                                       outcomeVariableColumnName = "valence",

@@ -244,7 +244,7 @@ plot_predictor_words = function(modelAssessment, topX, colors=c("blue", "orange"
       else {
         this_label = model_labels$name[i]
       }
-      print(egg::ggarrange(this_plotlist[[paste(i,"A",sep="")]], this_plotlist[[paste(i,"B",sep="")]], this_plotlist[[paste(i,"C",sep="")]], this_plotlist[[paste(i,"D",sep="")]], ncol=2, nrow=2, labels = c("", "", this_label, ""), heights = c(.05,.95), label.args = list(vjust=-.5, gp=gpar(fontsize=15, fontface="italic"))))
+      egg::ggarrange(this_plotlist[[paste(i,"A",sep="")]], this_plotlist[[paste(i,"B",sep="")]], this_plotlist[[paste(i,"C",sep="")]], this_plotlist[[paste(i,"D",sep="")]], ncol=2, nrow=2, labels = c("", "", this_label, ""), heights = c(.05,.95), label.args = list(vjust=-.5, gp=gpar(fontsize=15, fontface="italic")))
     }
   }
 
@@ -263,6 +263,6 @@ plot_predictor_words = function(modelAssessment, topX, colors=c("blue", "orange"
 
       height_vector = c(height_vector, .1, .9)
     }
-    print(egg::ggarrange(plots=this_plotlist, ncol=2, nrow=nrow(model_labels)*2, labels = label_vector, heights = height_vector, label.args = list(vjust=-.5, gp=gpar(fontsize=15, fontface="italic"))))
+    egg::ggarrange(plots=this_plotlist, ncol=2, nrow=nrow(model_labels)*2, labels = label_vector, heights = height_vector, label.args = list(vjust=-.5, gp=gpar(fontsize=15, fontface="italic")))
   }
 }
