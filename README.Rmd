@@ -1,0 +1,113 @@
+---
+title: "vignette"
+author: "Nathan Anderson"
+date: "2/15/2021"
+output: github_document
+---
+
+This packge implements the analysis described in Dobbins & Kantner 2019. It is intended to quantitatively assess natural language produced by participants, and use language choices to predict binary or continuous outcomes on a given measure.
+
+To install:
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("nlanderson9/languagePredictR")
+```
+
+
+This vignette walks through a potential use case: predicting IMDB movie ratings ("Positive" vs. "Negative", or a 1-10 star scale) from the text accompanying the rating.
+
+This package is designed to process data in three major phases:
+1. Cleaning/preparing text for analysis
+2. Creating a predictive model
+3. Assessing the model and comparing it to other models
+
+
+We'll start with a dataset of movie reviews from IMDB. The strong_movie_review_data dataset has 3 columns:
+text: Text reviews of movies (e.g. "I don't know why I like this movie so well, but I never get tired of watching it.")
+rating: A rating on a scale of 1-10 that accompanies the text
+valence: A label assigned based on the rating ("Positive" for ratings 6-10, "Negative" for ratings 1-5)
+
+The strong_movie_review_data dataset contains 2000 reviews - 1000 positive, 1000 negative. Specifically, this dataset only contains "strong" ratings - values of either 1 or 10.
+
+
+1. Preparing Text
+
+Here we are preparing the text for analysis. In its raw form, text strings can cause a lot of problems - since this package analyzes text on the word level, and is completely literal, any differences are interpreted as meaningful. For example, "done." and "done" are different words, as are"don't" and "do not."
+
+First, let's clean the text:
+
+```{r}
+strong_movie_review_data$cleanText = clean_text(strong_movie_review_data$text)
+```
+
+Here's an example of how the text changes:
+
+```{r}
+strong_movie_review_data$text[1]
+strong_movie_review_data$cleanText[1]
+```
+
+There are other tools in this package to clean up text. These include:
+idiosync_response_words - Removes words that occur repeatedly in a single text response, but nowhere else - these might influence the model in undesirable ways
+idiosync_participant_words - Similar to idiosync_response_words, but if you have responses grouped by participant, it will remove words used repeatedly by an individual participant and never by another participant.
+lemmatize - this will reduce words to their base units (e.g. "running" or "ran" becomes "run," "dogs" becomes "dog" and "geese" becomes "goose")
+
+2. Predict
+
+Once the text is ready, it's time to create our predictive model
+This is done using the language_model function, the core function of this package
+
+All you need to specify is the outcome variable (in this case, we're using language choice to predict whether the review is Positive or Negative) and what type the outcome variable is (here, a binary variable)
+
+```{r}
+movie_model_strong = language_model(strong_movie_review_data,
+                                      outcomeVariableColumnName = "valence",
+                                      outcomeVariableType = "binary",
+                                      textColumnName = "cleanText")
+```
+
+3. Assess
+
+There's not much we can do with this model output without assessing it. When we assess the model, we can do so in conjunction with other models in order to compare them.
+Let's compare our model with one based on another dataset: mild_movie_review_data. This dataset is very similar, except these reviews are more "mild" (4 and 7, instead of 1 and 10). Maybe people use stronger, and more predictive, language for stronger reviews?
+
+```{r}
+mild_movie_review_data$cleanText = clean_text(mild_movie_review_data$text)
+movie_model_mild = language_model(mild_movie_review_data,
+                                      outcomeVariableColumnName = "valence",
+                                      outcomeVariableType = "binary",
+                                      textColumnName = "cleanText")
+```
+
+Now, we can assess our models:
+
+```{r}
+movie_assessment = assess_models(movie_model_strong, movie_model_mild)
+```
+
+This "model_assessment" object can be used with a number of functions to help us see what's going on.
+
+For binary models, plot_roc will give us a good visual overview:
+
+```{r}
+plot_roc(movie_assessment, individual_plot = FALSE, facet_plot = FALSE)
+```
+
+As we can see, language does appear to predict review valence for both datasets - but it's higher for strong reviews! But is this significant? Let's check:
+
+```{r}
+test_output = analyze_roc(movie_assessment, plot=FALSE)
+test_output
+```
+
+It is !
+
+Finally, let's see what words the model is using to predict our outcome variable. The LASSO constraint used to build the model reduces the number of predictors significantly, so we can look at which words are driving these predictions.
+
+Even with the number of items reduced, it can sometimes be a lot to plot. Let's look at the top 15:
+
+```{r}
+plot_predictor_words(movie_assessment, topX = 15)
+```
+
