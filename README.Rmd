@@ -14,6 +14,11 @@ To install:
 devtools::install_github("nlanderson9/languagePredictR")
 ```
 
+```{r}
+library(languagePredictR)
+```
+
+
 
 This vignette walks through a potential use case: predicting IMDB movie ratings ("Positive" vs. "Negative", or a 1-10 star scale) from the text accompanying the rating.
 
