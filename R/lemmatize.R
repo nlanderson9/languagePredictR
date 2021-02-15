@@ -10,6 +10,7 @@
 #'
 #' @seealso the \code{\link[koRpus]{treetag}} function from the \code{koRpus} package, as well as the treetagger documentation: \url{https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}
 #'
+#' @import koRpus.lang.en
 #' @importFrom koRpus treetag
 #' @importFrom pbapply pblapply
 #' @importFrom rlang .data
