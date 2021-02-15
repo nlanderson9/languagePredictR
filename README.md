@@ -14,18 +14,6 @@ To install:
 devtools::install_github("nlanderson9/languagePredictR")
 ```
 
-    ## Downloading GitHub repo nlanderson9/languagePredictR@HEAD
-
-    ## Installing 39 packages: crayon, cli, cpp11, tibble, dplyr, mime, tinytex, xfun, withr, knitr, hms, Rcpp, BH, broom, forcats, DBI, RcppArmadillo, diffobj, waldo, brio, testthat, plotrix, expm, rappdirs, cachem, fastmap, promises, httpuv, sp, pixmap, segmented, reprex, dbplyr, koRpus, stopwords, ggrepel, shiny, pROC, glmnet
-
-    ## Installing packages into '/private/var/folders/4p/n014f5rx3rb83vsf2c0f8h000000gn/T/Rtmp6EvRpG/temp_libpath11a541226060e'
-    ## (as 'lib' is unspecified)
-
-    ## installing the source packages 'mime', 'testthat', 'cachem'
-
-    ## Installing package into '/private/var/folders/4p/n014f5rx3rb83vsf2c0f8h000000gn/T/Rtmp6EvRpG/temp_libpath11a541226060e'
-    ## (as 'lib' is unspecified)
-
 ``` r
 library(languagePredictR)
 ```
@@ -35,15 +23,16 @@ ratings (“Positive” vs. “Negative”, or a 1-10 star scale) from the text
 accompanying the rating.
 
 This package is designed to process data in three major phases:  
-1. Cleaning/preparing text for analysis 2. Creating a predictive model
+1. Cleaning/preparing text for analysis  
+2. Creating a predictive model  
 3. Assessing the model and comparing it to other models
 
 We’ll start with a dataset of movie reviews from IMDB. The
 `strong_movie_review_data` dataset has 3 columns:  
-text: Text reviews of movies (e.g. “I don’t know why I like this movie
+*text: Text reviews of movies (e.g. “I don’t know why I like this movie
 so well, but I never get tired of watching it.”)  
-rating: A rating on a scale of 1-10 that accompanies the text  
-valence: A label assigned based on the rating (“Positive” for ratings
+*rating: A rating on a scale of 1-10 that accompanies the text  
+\*valence: A label assigned based on the rating (“Positive” for ratings
 6-10, “Negative” for ratings 1-5)
 
 The `strong_movie_review_data` dataset contains 2000 reviews - 1000
@@ -79,16 +68,16 @@ strong_movie_review_data$cleanText[1]
     ## [1] "arnold once again in the demonstrated that he was the king of action and one liners in this futuristic film about a violent game show that no contestant survives but as the tag line says arnold has yet to play the movie begins in the year in which the world economy has collapsed with food and other important materials in short supply and a totalitarian state has arisen controlling every aspect of life through tv and a police state it is most popular game show is the running man in which criminals are forced to survive against stalkers that live to kill them the movie opens with ben richards arnold leading a helicopter mission to observe a food riot in progress he is ordered by his superiors to fire on them refusing to gets him knocked out and thrown in prison in the meantime they slaughtered the people without his help the government blames richards for the massacre earning him the name butcher of bakersfield eighteen months later richards along with two friends william laughlin koto and harold weiss mcintyre breakout of a detention zone they worked in they make their way to the underground led by mic mick fleetwood mic quickly identifies richards as the butcher of bakersfield and refuses to help him but his friend convince him otherwise they want him to join the resistance but he would rather go live with his brother and get a job soon he finds that his brother has been taken away for reeducation and a woman name amber mendez alonso has taken his apartment knowing who he is she will not help him but he convinces her but is busted at the airport by the cops after she ratted him out meantime the running man is having trouble finding good new blood for the there stalkers to kill damon killian dawson the shows host and one of the most powerful men in the country sees richards escape footage and is able to get him for the show after his capture richards refuses to play killian threatens to use his friends instead of him so he signs the contract you will love that part but soon he finds they will join him as well and makes sure killian knows he will be back the runners begin to make there way through the zones and fight characters that are memorable sub zero buzz saw and many others eventually richards is joined by amber who suspected he was set up but was caught and thrown into the game too together they find the underground and make there way back to killian and give him a farewell send off the running man is another one of arnold great movies from the the movie was apparently somewhat based on stephen king book of the same name some have said that the book is better i am sure it is not and i do not care anyway i loved the movie as in all of arnold films the acting is what you would expect with classic one liners from arnold and even ventura gets a couple in but without a doubt richard dawson is the standout in this film being a real game show host he easily spoofed himself and was able to create a character that was truly cold blooded the whole movie itself somewhat rips on game shows and big brother watching you keep an eye out for them poking fun and some old shows hate boat among others also the cast was great besides arnold koto and alonzo do not forget professor toru tanaka jim brown ventura and sven ole with all the reality tv nonsense that goes on it almost fits in better now but i am sure the hollywood liberals would make it into a movie about the evil bush the new dvd had mostly poor extras meet the stalkers being the only redeemable one some how the aclu managed to get some of there communism into the dvd and is laughable garbage that should not be anywhere near an arnold movie of all things blasphemy overall for any arnold fan especially we who grew up in the on him you can not miss this its one of the first ones i saw back in the and it is still great to this day the futuristic world and humor are great overall out stars definitely one of his best"
 
 There are other tools in this package to clean up text. These include:  
-`check_spelling` - Corrects mis-spelled words  
-`idiosync_response_words` - Removes words that occur repeatedly in a
+*`check_spelling` - Corrects mis-spelled words  
+*`idiosync_response_words` - Removes words that occur repeatedly in a
 single text response, but nowhere else - these might influence the model
 in undesirable ways  
-`idiosync_participant_words` - Similar to `idiosync_response_words`, but
-if you have responses grouped by participant, it will remove words used
-repeatedly by an individual participant and never by another
+*`idiosync_participant_words` - Similar to `idiosync_response_words`,
+but if you have responses grouped by participant, it will remove words
+used repeatedly by an individual participant and never by another
 participant.  
-`lemmatize` - Reduces words to their base units (e.g. “running” or “ran”
-becomes “run,” “dogs” becomes “dog” and “geese” becomes “goose”)
+*`lemmatize` - Reduces words to their base units (e.g. “running” or
+“ran” becomes “run,” “dogs” becomes “dog” and “geese” becomes “goose”)
 
 ### 2. Predict
 
@@ -153,7 +142,7 @@ test_output
 ```
 
     ##               model1           model2 model1_auc model2_auc      p_value sig
-    ## 1 movie_model_strong movie_model_mild   0.979426   0.924596 1.619106e-19 ***
+    ## 1 movie_model_strong movie_model_mild   0.979426   0.909267 1.375084e-25 ***
 
 It is !
 
