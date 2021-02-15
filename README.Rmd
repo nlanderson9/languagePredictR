@@ -3,7 +3,7 @@ title: languagePredictR
 output: github_document
 ---
 
-[PDF manual here](https://github.com/nlanderson9/languagePredictR/blob/main/docs/languagePredictR_0.1.0.pdf)
+**[PDF manual here](https://github.com/nlanderson9/languagePredictR/blob/main/docs/languagePredictR_0.1.0.pdf)**
 
 This package implements the analysis described in [Dobbins & Kantner 2019](https://www.sciencedirect.com/science/article/abs/pii/S0010027719301611). It is intended to quantitatively assess natural language produced by participants, and use language choices to predict binary or continuous outcomes on a given measure.
 
