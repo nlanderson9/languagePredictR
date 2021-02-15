@@ -3,6 +3,8 @@ title: languagePredictR
 output: github_document
 ---
 
+[PDF manual here](https://github.com/nlanderson9/languagePredictR/blob/main/docs/languagePredictR_0.1.0.pdf)
+
 This package implements the analysis described in [Dobbins & Kantner 2019](https://www.sciencedirect.com/science/article/abs/pii/S0010027719301611). It is intended to quantitatively assess natural language produced by participants, and use language choices to predict binary or continuous outcomes on a given measure.
 
 To install:
@@ -27,9 +29,9 @@ This package is designed to process data in three major phases:
 
 
 We'll start with a dataset of movie reviews from IMDB. The `strong_movie_review_data` dataset has 3 columns:  
-*text: Text reviews of movies (e.g. "I don't know why I like this movie so well, but I never get tired of watching it.")  
-*rating: A rating on a scale of 1-10 that accompanies the text  
-*valence: A label assigned based on the rating ("Positive" for ratings 6-10, "Negative" for ratings 1-5)  
+* text: Text reviews of movies (e.g. "I don't know why I like this movie so well, but I never get tired of watching it.")  
+* rating: A rating on a scale of 1-10 that accompanies the text  
+* valence: A label assigned based on the rating ("Positive" for ratings 6-10, "Negative" for ratings 1-5)  
 
 The `strong_movie_review_data` dataset contains 2000 reviews - 1000 positive, 1000 negative. Specifically, this dataset only contains "strong" ratings - values of either 1 or 10.
 
@@ -47,15 +49,15 @@ strong_movie_review_data$cleanText = clean_text(strong_movie_review_data$text)
 Here's an example of how the text changes:
 
 ```{r}
-strong_movie_review_data$text[1]
-strong_movie_review_data$cleanText[1]
+strong_movie_review_data$text[1740]
+strong_movie_review_data$cleanText[1740]
 ```
 
 There are other tools in this package to clean up text. These include:   
-*`check_spelling` - Corrects mis-spelled words   
-*`idiosync_response_words` - Removes words that occur repeatedly in a single text response, but nowhere else - these might influence the model in undesirable ways   
-*`idiosync_participant_words` - Similar to `idiosync_response_words`, but if you have responses grouped by participant, it will remove words used repeatedly by an individual participant and never by another participant.   
-*`lemmatize` - Reduces words to their base units (e.g. "running" or "ran" becomes "run," "dogs" becomes "dog" and "geese" becomes "goose")
+* `check_spelling` - Corrects mis-spelled words   
+* `idiosync_response_words` - Removes words that occur repeatedly in a single text response, but nowhere else - these might influence the model in undesirable ways   
+* `idiosync_participant_words` - Similar to `idiosync_response_words`, but if you have responses grouped by participant, it will remove words used repeatedly by an individual participant and never by another participant.   
+* `lemmatize` - Reduces words to their base units (e.g. "running" or "ran" becomes "run," "dogs" becomes "dog" and "geese" becomes "goose")
 
 ### 2. Predict
 
