@@ -72,6 +72,16 @@ check_spelling = function(inputText, mode, customSpellingList) {
 
   if (mode == "output" | mode == "both" | (mode == "replace" & missing(customSpellingList))) {
     full_text = paste(unlist(inputText), collapse = " ")
+    word_count = ntoken(full_text)
+    if (word_count > 30000) {
+      result = askYesNo("Large language datasets can take a significantly long time to process. Are you sure you want to continue?")
+      if (is.na(result)) {
+        stop("Function aborted.")
+      }
+      if (!result) {
+        stop("Function aborted.")
+      }
+    }
     bad = hunspell(full_text)
 
     spelling = data.frame(table(bad[[1]]))
