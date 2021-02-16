@@ -1,8 +1,11 @@
 languagePredictR
 ================
 
-[PDF manual
-here](https://github.com/nlanderson9/languagePredictR/blob/main/docs/languagePredictR_0.1.0.pdf)
+**[PDF manual
+here](https://github.com/nlanderson9/languagePredictR/blob/main/docs/languagePredictR_0.1.0.pdf)**
+
+**[Interactive Demo
+here](https://nlanderson9.shinyapps.io/languagePredictR_shiny_demo/)**
 
 This package implements the analysis described in [Dobbins & Kantner
 2019](https://www.sciencedirect.com/science/article/abs/pii/S0010027719301611).
@@ -145,7 +148,7 @@ test_output
 ```
 
     ##               model1           model2 model1_auc model2_auc      p_value sig
-    ## 1 movie_model_strong movie_model_mild   0.979426   0.919701 1.855247e-21 ***
+    ## 1 movie_model_strong movie_model_mild   0.979426   0.914617 1.775023e-23 ***
 
 It is !
 
