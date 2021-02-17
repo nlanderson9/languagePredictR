@@ -40,5 +40,6 @@ Imports:
     graphics,
     rlang,
     tibble,
-    methods
+    methods,
+    lubridate
 RoxygenNote: 7.1.1

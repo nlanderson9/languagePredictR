@@ -12,6 +12,7 @@
 #' @import ggplot2
 #' @import dplyr
 #' @import stringr
+#' @import lubridate
 #' @importFrom hunspell hunspell hunspell_suggest
 #' @importFrom rlang .data
 #'
@@ -71,10 +72,10 @@ check_spelling = function(inputText, mode, customSpellingList) {
   }
 
   if (mode == "output" | mode == "both" | (mode == "replace" & missing(customSpellingList))) {
-    full_text = paste(unlist(inputText), collapse = " ")
-    word_count = ntoken(full_text)
-    if (word_count > 30000) {
-      result = askYesNo("Large language datasets can take a significantly long time to process. Are you sure you want to continue?")
+    word_count = sum(ntoken(inputText))
+    time_estimate = ceiling(3.970e-04*word_count + 1.270e-07*(word_count^2) + -2.795e-01)
+    if (time_estimate > 60) {
+      result = askYesNo(paste("Based on the size of your language dataset, it's possible this function could take ~'", seconds_to_period(time_estimate), "' to complete. Are you sure you want to continue?", sep=""))
       if (is.na(result)) {
         stop("Function aborted.")
       }
@@ -82,9 +83,14 @@ check_spelling = function(inputText, mode, customSpellingList) {
         stop("Function aborted.")
       }
     }
+
+    full_text = paste(unlist(inputText), collapse = " ")
     bad = hunspell(full_text)
 
     spelling = data.frame(table(bad[[1]]))
+    if (nrow(spelling) == 0) {
+      stop("There are no spelling errors in your data!")
+    }
     colnames(spelling) = c("error", "freq")
 
     correct = hunspell_suggest(as.character(spelling$error))
