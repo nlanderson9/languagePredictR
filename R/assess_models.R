@@ -140,8 +140,15 @@ assess_models = function(...) {
 
         cat0data = input@cat0raw
         cat1data = input@cat1raw
+        if (nrow(cat0data) == 0) {
+          cat0data = data.frame(words="", weights=0)
+        }
+        if (nrow(cat1data) == 0) {
+          cat1data = data.frame(words="", weights=0)
+        }
         cat0data$class = "cat0"
         cat1data$class = "cat1"
+
         cat_data_temp = rbind(cat0data, cat1data)
         cat_data_temp$model = as.character(dots_names$...[[i]])
         cat_data = rbind(cat_data, cat_data_temp)
