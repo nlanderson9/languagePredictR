@@ -1,6 +1,5 @@
 #' @title langModel Class
 #'
-#' @slot original_dataframe The dataframe used to create the model
 #' @slot data_text The text input to create the corpus/model
 #' @slot data_outcome The outcome variabe input to create the model
 #' @slot type Model type, "binary" or "continuous"
@@ -19,7 +18,7 @@
 #' @export langModel
 #' @exportClass langModel
 
-langModel = setClass("langModel", slots = c("original_dataframe", "data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw"))
+langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw"))
 
 
 #' @title Create Language Model
@@ -191,7 +190,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
   cat0raw$words <- factor(cat0raw$words, levels = cat0raw$words[order(cat0raw$weights,decreasing = T)])
 
 
-  output = new("langModel", original_dataframe = inputDataframe, data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw)
+  output = new("langModel", data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw)
 
   return(output)
 }
