@@ -11,10 +11,12 @@
 #' @param inputText A character string or vector of character strings
 #' @param replaceSymbol If TRUE, symbols are replaced with their equivalent (e.g. "@" becomes "at"). Defaults to FALSE.
 #' @param replaceNumber If TRUE, numbers are replaced with their equivalent (e.g. "20" becomes "twenty", "3rd" becomes "third"). Defaults to FALSE.
+#' @param removeStopwords If TRUE, stopwords are removed (see [stopwords()])
 #'
 #' @return A character string (or vector of character strings) with cleaned text.
 #'
 #' @import textclean
+#' @import stopwords
 #'
 #' @export
 #'
@@ -32,7 +34,7 @@
 
 
 
-clean_text = function(inputText, replaceSymbol=FALSE, replaceNumber=FALSE) {
+clean_text = function(inputText, replaceSymbol=FALSE, replaceNumber=FALSE, removeStopwords=FALSE) {
   if (!is.character(inputText)) {
     stop("The inputText argument needs to be a character string.")
   }
@@ -53,13 +55,21 @@ clean_text = function(inputText, replaceSymbol=FALSE, replaceNumber=FALSE) {
     new_text = gsub("[0-9](st|nd|rd|th)", " ", new_text)
     new_text = gsub("[0-9]", "", new_text)
   }
-  new_text = gsub("\\s+", " ", new_text)
-  new_text = gsub("^\\s+|\\s+$", "", new_text)
+
+  new_text = tolower(new_text)
 
   # messing with the text itself can sometimes leave isolated instances of "s" (probably from possessives)
   new_text = gsub(" s ", " ", new_text)
   new_text = gsub("^s ", "", new_text)
   new_text = gsub(" s$", "", new_text)
-  new_text = tolower(new_text)
+
+  if (removeStopwords) {
+    as_tokens = tokens(new_text) %>% tokens_remove(stopwords()) %>% as.list()
+    new_text = lapply(as_tokens, function(x) {paste(x, collapse = " ")})
+  }
+
+  new_text = gsub("\\s+", " ", new_text)
+  new_text = gsub("^\\s+|\\s+$", "", new_text)
+
   return(new_text)
 }

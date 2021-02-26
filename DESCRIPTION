@@ -41,5 +41,6 @@ Imports:
     rlang,
     tibble,
     methods,
-    lubridate
+    lubridate,
+    stopwords
 RoxygenNote: 7.1.1
