@@ -9,7 +9,6 @@ word_network(
   model = NULL,
   topX = 100,
   directed = FALSE,
-  layout = layout.fruchterman.reingold,
   removeVerticesBelowDegree = 2,
   edgeColor = "darkgray",
   edgeAlpha = 0.5,
@@ -29,8 +28,6 @@ word_network(
 \item{topX}{The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.}
 
 \item{directed}{Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).}
-
-\item{layout}{A layout provided by the \code{igraph} function. The default is layout.fruchterman.reingold (The Fruchterman-Reingold Force-Directed layout)}
 
 \item{removeVerticesBelowDegree}{An integer which determines the minimum number of edges a node must have to be included. Default is 2.}
 
