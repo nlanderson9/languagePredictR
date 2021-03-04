@@ -42,5 +42,6 @@ Imports:
     tibble,
     methods,
     lubridate,
-    stopwords
+    stopwords,
+    igraph
 RoxygenNote: 7.1.1

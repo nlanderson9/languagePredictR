@@ -14,6 +14,7 @@
 #' @import stringr
 #' @import lubridate
 #' @importFrom hunspell hunspell hunspell_suggest
+#' @importFrom utils askYesNo
 #' @importFrom rlang .data
 #'
 #' @export

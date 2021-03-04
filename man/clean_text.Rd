@@ -4,7 +4,12 @@
 \alias{clean_text}
 \title{Clean Input Text}
 \usage{
-clean_text(inputText, replaceSymbol = FALSE, replaceNumber = FALSE)
+clean_text(
+  inputText,
+  replaceSymbol = FALSE,
+  replaceNumber = FALSE,
+  removeStopwords = FALSE
+)
 }
 \arguments{
 \item{inputText}{A character string or vector of character strings}
@@ -12,6 +17,8 @@ clean_text(inputText, replaceSymbol = FALSE, replaceNumber = FALSE)
 \item{replaceSymbol}{If TRUE, symbols are replaced with their equivalent (e.g. "@" becomes "at"). Defaults to FALSE.}
 
 \item{replaceNumber}{If TRUE, numbers are replaced with their equivalent (e.g. "20" becomes "twenty", "3rd" becomes "third"). Defaults to FALSE.}
+
+\item{removeStopwords}{If TRUE, stopwords are removed (see [stopwords()])}
 }
 \value{
 A character string (or vector of character strings) with cleaned text.

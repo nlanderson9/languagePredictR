@@ -11,8 +11,6 @@ langModel Class
 \section{Slots}{
 
 \describe{
-\item{\code{original_dataframe}}{The dataframe used to create the model}
-
 \item{\code{data_text}}{The text input to create the corpus/model}
 
 \item{\code{data_outcome}}{The outcome variabe input to create the model}
