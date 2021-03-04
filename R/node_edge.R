@@ -118,7 +118,7 @@ node_edge = function(input, maxDist=4, removeStopwords=FALSE, showProgress = TRU
     level0_text = subset(text_dataframe, outcome==input@level0)
     level1_text = subset(text_dataframe, outcome==input@level1)
     level0_result = make_node_edge_table(level0_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level0, showProgress = showProgress)
-    level1_result = make_node_edge_table(level1_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level0, showProgress = showProgress)
+    level1_result = make_node_edge_table(level1_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level1, showProgress = showProgress)
     level0_result$outcome = input@level0
     level1_result$outcome = input@level1
     combined_result = bind_rows(level0_result, level1_result)

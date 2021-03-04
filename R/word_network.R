@@ -18,7 +18,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom igraph graph.data.frame E V degree delete.vertices plot.igraph layout
+#' @importFrom igraph graph.data.frame E<- V<- degree delete.vertices plot.igraph layout
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
 #' @importFrom graphics par
