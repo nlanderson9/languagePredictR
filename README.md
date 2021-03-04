@@ -146,8 +146,8 @@ test_output = analyze_roc(movie_assessment, plot=FALSE)
 test_output
 ```
 
-    ##               model1           model2 model1_auc model2_auc      p_value sig
-    ## 1 movie_model_strong movie_model_mild   0.979426    0.91961 1.790522e-21 ***
+    ##               model1           model2 model1_auc model2_auc     p_value sig
+    ## 1 movie_model_strong movie_model_mild   0.979426   0.924531 1.60408e-19 ***
 
 It is !
 
@@ -172,11 +172,8 @@ plotting tools. Let’s take a look at the movie\_model\_strong networks:
 network_table = node_edge(movie_model_strong, removeStopwords = TRUE)
 ```
 
-    ## [1] "Creating table for 'Negative' text..."
-    ## [1] "Creating table for 'Positive' text..."
-
 ``` r
 word_network(network_table, model=movie_model_strong, topX=50)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
