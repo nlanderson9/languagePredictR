@@ -147,7 +147,7 @@ test_output
 ```
 
     ##               model1           model2 model1_auc model2_auc      p_value sig
-    ## 1 movie_model_strong movie_model_mild   0.979426   0.919701 1.855247e-21 ***
+    ## 1 movie_model_strong movie_model_mild   0.979426    0.91961 1.790522e-21 ***
 
 It is !
 
@@ -164,3 +164,19 @@ plot_predictor_words(movie_assessment, topX = 15, print_summary = FALSE)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+
+What do these words mean in context? We can investigate with the network
+plotting tools. Let’s take a look at the movie\_model\_strong networks:
+
+``` r
+network_table = node_edge(movie_model_strong, removeStopwords = TRUE)
+```
+
+    ## [1] "Creating table for 'Negative' text..."
+    ## [1] "Creating table for 'Positive' text..."
+
+``` r
+word_network(network_table, model=movie_model_strong, topX=50)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
