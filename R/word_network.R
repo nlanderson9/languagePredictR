@@ -119,6 +119,8 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' @param input An input dataframe, typically the output from the \code{node_edge} function
 #' @param model Optional - if \code{node_edge} used a model as input, the same model can be provided here for extra functionality
 #' @param topX The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.
+#' @param graphIndividual If TRUE, individual graphs are produced for both outcomes of the model. Default is TRUE.
+#' @param graphCombined If TRUE, a network is graphed based on the entire language corpus. Default is FALSE.
 #' @param directed Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).
 #' @param removeVerticesBelowDegree An integer which determines the minimum number of edges a node must have to be included. Default is 2.
 #' @param edgeColor The color of the edges. Default is "darkgray".
@@ -150,7 +152,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' word_network(node_edge_table)
 #' }
 
-word_network = function(input, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
+word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graphCombined=FALSE, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
 
   outcome=NULL
 
@@ -177,9 +179,13 @@ word_network = function(input, model=NULL, topX=100, directed=FALSE, removeVerti
       title2 = plotTitle[3]
     }
 
-    make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-    make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-    make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    if(graphIndividual){
+      make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    }
+    if(graphCombined){
+      make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    }
   }
   else {
     if (is.null(plotTitle) | !plotTitle) {
