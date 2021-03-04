@@ -117,3 +117,10 @@ Even with the number of items reduced, it can sometimes be a lot to plot. Let's 
 plot_predictor_words(movie_assessment, topX = 15, print_summary = FALSE)
 ```
 
+What do these words mean in context? We can investigate with the network plotting tools. Let's take a look at the movie_model_strong networks:
+
+```{r}
+network_table = node_edge(movie_model_strong)
+word_network(network_table, model=movie_model_strong)
+```
+
