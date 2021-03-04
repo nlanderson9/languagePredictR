@@ -4,7 +4,6 @@
 #' @param model The (optional) language model from language_model
 #' @param topX The top X words to include
 #' @param directed Whether the network is directed
-#' @param layout The network layout
 #' @param removeVerticesBelowDegree Number of minimum edges a node must have to include
 #' @param edgeColor Edge color
 #' @param edgeAlpha Edge alpha
@@ -18,12 +17,12 @@
 #'
 #' @noRd
 #'
-#' @importFrom igraph graph.data.frame E<- V<- degree delete.vertices plot.igraph layout
+#' @importFrom igraph graph.data.frame E<- V<- degree delete.vertices plot.igraph layout_ with_fr
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
 #' @importFrom graphics par
 
-make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, layout = layout.fruchterman.reingold, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", cat=NULL) {
+make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", cat=NULL) {
 
   cooc_count = outcome = NULL
 
@@ -97,6 +96,8 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     par(mai=c(0,0,.5,0))
   }
 
+  layout = layout_(graphNetwork, with_fr())
+
   # Final Plot
   plot(
     graphNetwork,
@@ -119,7 +120,6 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' @param model Optional - if \code{node_edge} used a model as input, the same model can be provided here for extra functionality
 #' @param topX The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.
 #' @param directed Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).
-#' @param layout A layout provided by the \code{igraph} function. The default is layout.fruchterman.reingold (The Fruchterman-Reingold Force-Directed layout)
 #' @param removeVerticesBelowDegree An integer which determines the minimum number of edges a node must have to be included. Default is 2.
 #' @param edgeColor The color of the edges. Default is "darkgray".
 #' @param edgeAlpha The alpha of the edges. Default is 0.5.
@@ -150,7 +150,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' word_network(node_edge_table)
 #' }
 
-word_network = function(input, model=NULL, topX=100, directed=FALSE, layout = layout.fruchterman.reingold, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
+word_network = function(input, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
 
   outcome=NULL
 
@@ -177,9 +177,9 @@ word_network = function(input, model=NULL, topX=100, directed=FALSE, layout = la
       title2 = plotTitle[3]
     }
 
-    make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, layout=layout, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-    make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, layout=layout, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-    make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, layout=layout, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
   }
   else {
     if (is.null(plotTitle) | !plotTitle) {
@@ -191,6 +191,6 @@ word_network = function(input, model=NULL, topX=100, directed=FALSE, layout = la
       }
       plot_title = plotTitle
     }
-    make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, layout=layout, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
   }
 }
