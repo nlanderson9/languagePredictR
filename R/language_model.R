@@ -31,6 +31,7 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' @param textColumnName A string consisting of the column name for the text data in \code{inputDataframe}
 #' @param ngrams A string defining the ngrams to serve as predictors in the model. Defaults to "1". For more information, see the \code{okens_ngrams} function in the \code{quanteda} package
 #' @param dfmWeightScheme A string defining the weight scheme you wish to use for constructing a document-frequency matrix. Default is "count". For more information, see the \code{dfm_weight} function in the \code{quanteda} package
+#' @param lossMeasure A string defining the loss measure to use. Must be one of the options given by \code{cv.glmnet}. Default is "deviance".
 #' @param lambda A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package
 #' @param progressBar Show a progress bar. Defaults to TRUE.
 #'
@@ -78,7 +79,7 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' 10-fold cross validation is currently implemented to reduce overfitting to the data.\cr
 #' Additionally, a LASSO constraint is used (following Tibshirani, 1996; see References) to eliminate weakly-predictive variables. This reduces the number of predictors (i.e. word engrams) to sparse, interpretable set.
 
-language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count",lambda="lambda.min", progressBar=TRUE) {
+language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count", lossMeasure="deviance", lambda="lambda.min", progressBar=TRUE) {
 
   weights=words=NULL
 
@@ -172,7 +173,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
     show_progress = 0
   }
 
-  cv1<-cv.glmnet(x,y,family=familytype,type.measure='deviance',nfolds=10,standardize=F,
+  cv1<-cv.glmnet(x,y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
                  intercept=T,alpha=1, trace.it=show_progress)
 
   #recover weights and words
