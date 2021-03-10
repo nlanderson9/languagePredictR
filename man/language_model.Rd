@@ -11,7 +11,12 @@ language_model(
   textColumnName,
   ngrams = "1",
   dfmWeightScheme = "count",
+  lossMeasure = "deviance",
   lambda = "lambda.min",
+  parallelCores = NULL,
+  permutePValue = FALSE,
+  permutationK = 1000,
+  permuteByGroup = NULL,
   progressBar = TRUE
 )
 }
@@ -28,7 +33,17 @@ language_model(
 
 \item{dfmWeightScheme}{A string defining the weight scheme you wish to use for constructing a document-frequency matrix. Default is "count". For more information, see the \code{dfm_weight} function in the \code{quanteda} package}
 
+\item{lossMeasure}{A string defining the loss measure to use. Must be one of the options given by \code{cv.glmnet}. Default is "deviance".}
+
 \item{lambda}{A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package}
+
+\item{parallelCores}{An integer defining the number of cores to use in parallel processing for model creation. Defaults to NULL (no parallel processing).}
+
+\item{permutePValue}{If TRUE, a permutation test is run to estimate a p-value for the model (i.e. whether the language provided significantly predicts the outcome variable). Warning: this can take a while depending on the size of the dataset and number of permutations!}
+
+\item{permutationK}{The number of permutations to run in a permutation test. Only used if \code{permutePValue = TRUE}. Defaults to 1000.}
+
+\item{permuteByGroup}{A string consisting of the column name defining a grouping variable in the dataset (usually a participant number). This means that when permutations are randomized, they will permute items on a group level rather than trial level. Default is NULL (no group variable considered).}
 
 \item{progressBar}{Show a progress bar. Defaults to TRUE.}
 }

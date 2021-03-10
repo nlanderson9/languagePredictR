@@ -8,6 +8,8 @@ word_network(
   input,
   model = NULL,
   topX = 100,
+  graphIndividual = TRUE,
+  graphCombined = FALSE,
   directed = FALSE,
   removeVerticesBelowDegree = 2,
   edgeColor = "darkgray",
@@ -26,6 +28,10 @@ word_network(
 \item{model}{Optional - if \code{node_edge} used a model as input, the same model can be provided here for extra functionality}
 
 \item{topX}{The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.}
+
+\item{graphIndividual}{If TRUE, individual graphs are produced for both outcomes of the model. Default is TRUE.}
+
+\item{graphCombined}{If TRUE, a network is graphed based on the entire language corpus. Default is FALSE.}
 
 \item{directed}{Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).}
 

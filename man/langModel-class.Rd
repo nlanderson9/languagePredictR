@@ -38,5 +38,7 @@ langModel Class
 \item{\code{cat0raw}}{The predictors (word engrams) predicting the level0 outcome, with their model weights}
 
 \item{\code{cat1raw}}{The predictors (word engrams) predicting the level1 outcome, with their model weights}
+
+\item{\code{p_value}}{The p-value estimated via permutation test}
 }}
 
