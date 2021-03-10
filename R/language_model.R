@@ -33,6 +33,7 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' @param dfmWeightScheme A string defining the weight scheme you wish to use for constructing a document-frequency matrix. Default is "count". For more information, see the \code{dfm_weight} function in the \code{quanteda} package
 #' @param lossMeasure A string defining the loss measure to use. Must be one of the options given by \code{cv.glmnet}. Default is "deviance".
 #' @param lambda A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package
+#' @param parallelCores An integer defining the number of cores to use in parallel processing for model creation. Defaults to NULL (no parallel processing).
 #' @param progressBar Show a progress bar. Defaults to TRUE.
 #'
 #' @return An object of the type "langModel"
@@ -43,6 +44,8 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #'
 #' @import quanteda
 #' @import glmnet
+#' @import Matrix
+#' @importFromt doParallel registerDoParallel
 #' @importFrom methods setClass new
 #' @importFrom rlang .data
 #'
@@ -79,7 +82,7 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' 10-fold cross validation is currently implemented to reduce overfitting to the data.\cr
 #' Additionally, a LASSO constraint is used (following Tibshirani, 1996; see References) to eliminate weakly-predictive variables. This reduces the number of predictors (i.e. word engrams) to sparse, interpretable set.
 
-language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count", lossMeasure="deviance", lambda="lambda.min", progressBar=TRUE) {
+language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count", lossMeasure="deviance", lambda="lambda.min", parallelCores=NULL, progressBar=TRUE) {
 
   weights=words=NULL
 
@@ -133,6 +136,15 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
     stop("Your lambda argument should be either 'lambda.min' (for the value of lambda that results in the minimum cross-validation error) or 'lambda.1se' (for the value of lambda 1 standard error above lambda.min).")
   }
 
+  if(!is.null(parallelCores)) {
+    if(!is.numeric(parallelCores)) {
+      stop("The `parallelCores` argument must be an integer.")
+    }
+    else {
+      registerDoParallel(parallelCores)
+    }
+  }
+
 
   m1dat<-subset(td, !is.na(cat))
 
@@ -159,6 +171,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
   x<-convert(dfm1, to = "data.frame")
   x = x[,2:ncol(x)]
   x<-as.matrix(x)
+  x = as(x, "dgCMatrix")
 
   #the dependent variable for fitting
   y<-m1dat$cat
@@ -173,8 +186,15 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
     show_progress = 0
   }
 
-  cv1<-cv.glmnet(x,y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
-                 intercept=T,alpha=1, trace.it=show_progress)
+
+  if(is.null(parallelCores)) {
+    cv1<-cv.glmnet(x,y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
+                   intercept=T,alpha=1, trace.it=show_progress)
+  }
+  else {
+    cv1<-cv.glmnet(x,y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
+                   intercept=T,alpha=1, parallel=TRUE, trace.it=show_progress)
+  }
 
   #recover weights and words
   model1_weights<-as.data.frame(as.matrix(coef(cv1,s=lambda))) # min or 1 SE rule

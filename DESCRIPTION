@@ -43,5 +43,7 @@ Imports:
     methods,
     lubridate,
     stopwords,
-    igraph
+    igraph,
+    doParallel,
+    Matrix
 RoxygenNote: 7.1.1
