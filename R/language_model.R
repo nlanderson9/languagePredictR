@@ -246,11 +246,11 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
 
       if(is.null(parallelCores)) {
         cv_permute<-cv.glmnet(x,permuted_y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
-                       intercept=T,alpha=1, trace.it=show_progress)
+                       intercept=T,alpha=1, trace.it=0)
       }
       else {
         cv_permute<-cv.glmnet(x,permuted_y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
-                       intercept=T,alpha=1, parallel=TRUE, trace.it=show_progress)
+                       intercept=T,alpha=1, parallel=TRUE, trace.it=0)
       }
       prediction_permute = predict(cv_permute, s=lambda, newx=x)
       permute_auc = suppressMessages(roc(permuted_y, as.numeric(prediction_permute)))
