@@ -14,11 +14,12 @@
 #' @slot level1 The top/second level of a binary variable, or the highest value of a continuous variable
 #' @slot cat0raw The predictors (word engrams) predicting the level0 outcome, with their model weights
 #' @slot cat1raw The predictors (word engrams) predicting the level1 outcome, with their model weights
+#' @slot p_value The p-value estimated via permutation test
 #'
 #' @export langModel
 #' @exportClass langModel
 
-langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw"))
+langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw", "p_value"))
 
 
 #' @title Create Language Model
@@ -34,6 +35,9 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' @param lossMeasure A string defining the loss measure to use. Must be one of the options given by \code{cv.glmnet}. Default is "deviance".
 #' @param lambda A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package
 #' @param parallelCores An integer defining the number of cores to use in parallel processing for model creation. Defaults to NULL (no parallel processing).
+#' @param permutePValue If TRUE, a permutation test is run to estimate a p-value for the model (i.e. whether the language provided significantly predicts the outcome variable). Warning: this can take a while depending on the size of the dataset and number of permutations!
+#' @param permutationK The number of permutations to run in a permutation test. Only used if \code{permutePValue = TRUE}. Defaults to 1000.
+#' @param permuteByGroup A string consisting of the column name defining a grouping variable in the dataset (usually a participant number). This means that when permutations are randomized, they will permute items on a group level rather than trial level. Default is NULL (no group variable considered).
 #' @param progressBar Show a progress bar. Defaults to TRUE.
 #'
 #' @return An object of the type "langModel"
@@ -82,7 +86,7 @@ langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type",
 #' 10-fold cross validation is currently implemented to reduce overfitting to the data.\cr
 #' Additionally, a LASSO constraint is used (following Tibshirani, 1996; see References) to eliminate weakly-predictive variables. This reduces the number of predictors (i.e. word engrams) to sparse, interpretable set.
 
-language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count", lossMeasure="deviance", lambda="lambda.min", parallelCores=NULL, progressBar=TRUE) {
+language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVariableType, textColumnName, ngrams="1", dfmWeightScheme="count", lossMeasure="deviance", lambda="lambda.min", parallelCores=NULL, permutePValue=FALSE, permutationK = 1000, permuteByGroup=NULL, progressBar=TRUE) {
 
   weights=words=NULL
 
@@ -145,6 +149,13 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
     }
   }
 
+  if (!is.null(permuteByGroup)) {
+    test_similarity = rename(count(inputDataframe, !!sym(outcomeVariableColumnName), !!sym(permuteByGroup)), Freq = n)
+    if (nrow(test_similarity) != unique(inputDataframe[[permuteByGroup]])) {
+      stop("Your groups defined by the `permuteByGroup` argument have heterogeneous outcomes (i.e. a given group member does not have a single outcome type).")
+    }
+  }
+
 
   m1dat<-subset(td, !is.na(cat))
 
@@ -196,6 +207,57 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
                    intercept=T,alpha=1, parallel=TRUE, trace.it=show_progress)
   }
 
+  if (permutePValue) {
+    prediction = predict(cv1, s=lambda, newx=x)
+    original_auc = suppressMessages(roc(y, as.numeric(prediction)))
+    original_auc = original_auc$auc
+
+    if (!is.null(permuteByGroup)) {
+      permutation_data = m1dat[,c(textColumnName, outcomeVariableColumnName, permuteByGroup)]
+      correspondences = m1dat[!duplicated(m1dat[[permuteByGroup]]),c(outcomeVariableColumnName, permuteByGroup)]
+      colnames(correspondences) = c("permuted_outcome", permuteByGroup)
+    }
+    aucs = c()
+    if(progressBar){
+      pb = progress_bar$new(total = permutationK, format = "[:bar]Permutations - :percent (eta :eta) (elapsed :elapsed) (:current / :total)")
+    }
+    for (i in 1:permutationK) {
+      if(progressBar){
+        pb$tick()
+      }
+      if(!is.null(permuteByGroup)) {
+        permuted_correspondences = transform(correspondences, permuted_outcome = sample(permuted_outcome))
+        permuted_data = permutation_data %>% left_join(permuted_correspondences, by = c(permuteByGroup = permuteByGroup))
+        if(outcomeVariableType=="binary"){
+          permuted_data$permuted_outcome = as.factor(permuted_data$permuted_outcome)
+        }
+        else if (outcomeVariableType=="continuous") {
+          permuted_data$permuted_outcome = as.numeric(permuted_data$permuted_outcome)
+        }
+        permuted_y = permuted_data$permuted_outcome
+      }
+      else {
+        permuted_y = sample(y)
+      }
+
+      if(is.null(parallelCores)) {
+        cv_permute<-cv.glmnet(x,permuted_y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
+                       intercept=T,alpha=1, trace.it=show_progress)
+      }
+      else {
+        cv_permute<-cv.glmnet(x,permuted_y,family=familytype,type.measure=lossMeasure,nfolds=10,standardize=F,
+                       intercept=T,alpha=1, parallel=TRUE, trace.it=show_progress)
+      }
+      prediction_permute = predict(cv_permute, s=lambda, newx=x)
+      permute_auc = suppressMessages(roc(permuted_y, as.numeric(prediction_permute)))
+      aucs = c(aucs, permute_auc$auc)
+    }
+    p_value = mean(aucs >= original_auc)
+  }
+  else {
+    p_value = NA
+  }
+
   #recover weights and words
   model1_weights<-as.data.frame(as.matrix(coef(cv1,s=lambda))) # min or 1 SE rule
   model1_words<-row.names(model1_weights)
@@ -211,7 +273,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
   cat0raw$words <- factor(cat0raw$words, levels = cat0raw$words[order(cat0raw$weights,decreasing = T)])
 
 
-  output = new("langModel", data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw)
+  output = new("langModel", data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw, p_value=p_value)
 
   return(output)
 }
