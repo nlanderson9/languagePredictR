@@ -151,7 +151,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
 
   if (!is.null(permuteByGroup)) {
     test_similarity = rename(count(inputDataframe, !!sym(outcomeVariableColumnName), !!sym(permuteByGroup)), Freq = n)
-    if (nrow(test_similarity) != unique(inputDataframe[[permuteByGroup]])) {
+    if (nrow(test_similarity) != length(unique(inputDataframe[[permuteByGroup]]))) {
       stop("Your groups defined by the `permuteByGroup` argument have heterogeneous outcomes (i.e. a given group member does not have a single outcome type).")
     }
   }
