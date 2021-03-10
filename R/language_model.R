@@ -15,11 +15,13 @@
 #' @slot cat0raw The predictors (word engrams) predicting the level0 outcome, with their model weights
 #' @slot cat1raw The predictors (word engrams) predicting the level1 outcome, with their model weights
 #' @slot p_value The p-value estimated via permutation test
+#' @slot auc The AUC of the model
+#' @slot permuted_aucs The aucs of each permutation in the permutation test
 #'
 #' @export langModel
 #' @exportClass langModel
 
-langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw", "p_value"))
+langModel = setClass("langModel", slots = c("data_text", "data_outcome", "type", "text", "outcome", "tokens", "x", "y", "cv", "lambda", "level0", "level1", "cat0raw", "cat1raw", "p_value", "auc", "permuted_aucs"))
 
 
 #' @title Create Language Model
@@ -207,11 +209,12 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
                    intercept=T,alpha=1, parallel=TRUE, trace.it=show_progress)
   }
 
-  if (permutePValue) {
-    prediction = predict(cv1, s=lambda, newx=x)
-    original_auc = suppressMessages(roc(y, as.numeric(prediction)))
-    original_auc = original_auc$auc
 
+  prediction = predict(cv1, s=lambda, newx=x)
+  original_auc = suppressMessages(roc(y, as.numeric(prediction)))
+  original_auc = original_auc$auc
+
+  if (permutePValue) {
     if (!is.null(permuteByGroup)) {
       permutation_data = m1dat[,c(textColumnName, outcomeVariableColumnName, permuteByGroup)]
       correspondences = m1dat[!duplicated(m1dat[[permuteByGroup]]),c(outcomeVariableColumnName, permuteByGroup)]
@@ -227,7 +230,8 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
       }
       if(!is.null(permuteByGroup)) {
         permuted_correspondences = transform(correspondences, permuted_outcome = sample(permuted_outcome))
-        permuted_data = permutation_data %>% left_join(permuted_correspondences, by = c(permuteByGroup = permuteByGroup))
+        this_by = enquo(permuteByGroup)
+        permuted_data = permutation_data %>% left_join(permuted_correspondences, by = quo_name(this_by))
         if(outcomeVariableType=="binary"){
           permuted_data$permuted_outcome = as.factor(permuted_data$permuted_outcome)
         }
@@ -256,6 +260,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
   }
   else {
     p_value = NA
+    permuted_aucs = NA
   }
 
   #recover weights and words
@@ -273,7 +278,7 @@ language_model = function(inputDataframe, outcomeVariableColumnName, outcomeVari
   cat0raw$words <- factor(cat0raw$words, levels = cat0raw$words[order(cat0raw$weights,decreasing = T)])
 
 
-  output = new("langModel", data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw, p_value=p_value)
+  output = new("langModel", data_text=inputDataframe[[textColumnName]], data_outcome=inputDataframe[[outcomeVariableColumnName]], type=outcomeVariableType, text=textColumnName, outcome=outcomeVariableColumnName, tokens=tokens1, x=x, y=y, cv=cv1, lambda=lambda, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw, p_value=p_value, auc=original_auc, permuted_aucs=aucs)
 
   return(output)
 }
