@@ -335,7 +335,7 @@ language_model = function(input, outcome, outcomeType, text, ngrams="1", dfmWeig
   cat0raw$words <- factor(cat0raw$words, levels = cat0raw$words[order(cat0raw$weights,decreasing = T)])
 
 
-  output = new("langModel", call=call, data_text=input[[text]], data_outcome=input[[outcome]], type=outcomeType, text=text, outcome=outcome, tokens=tokens1, ngrams=ngrams, dfmWeightScheme=dfmWeightScheme, x=x, y=y, cv=cv1, lambda=lambda, predicted_y=predicted_y, predicted_probabilities=predicted_probabilities, roc=roc, roc_ci=roc_ci, corr=corr, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw, p_value=p_value, lossMeasure=lossMeasure, cvm_type=cvm_type, cvm=cvm, permuted_cvms=cvm, permutationK = permutationK, minimum_p = 1/(permutationK+1), st_err_p = sqrt((p_value*(1-p_value))/permutationK))
+  output = new("langModel", call=call, data_text=input[[text]], data_outcome=input[[outcome]], type=outcomeType, text=text, outcome=outcome, tokens=tokens1, ngrams=ngrams, dfmWeightScheme=dfmWeightScheme, x=x, y=y, cv=cv1, lambda=lambda, predicted_y=predicted_y, predicted_probabilities=predicted_probabilities, roc=roc, roc_ci=roc_ci, corr=corr, level0=level0, level1=level1, cat1raw=cat1raw, cat0raw=cat0raw, p_value=p_value, lossMeasure=lossMeasure, cvm_type=cvm_type, cvm=cvm, permuted_cvms=cvms, permutationK = permutationK, minimum_p = 1/(permutationK+1), st_err_p = sqrt((p_value*(1-p_value))/permutationK))
 
   return(output)
 }
