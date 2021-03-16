@@ -71,6 +71,9 @@ movie_model_strong = language_model(strong_movie_review_data,
                                       outcome = "valence",
                                       outcomeType = "binary",
                                       text = "cleanText")
+```
+
+```{r}
 summary(movie_model_strong)
 ```
 
@@ -82,6 +85,9 @@ movie_model_mild = language_model(mild_movie_review_data,
                                       outcome = "valence",
                                       outcomeType = "binary",
                                       text = "cleanText")
+```
+
+```{r}
 summary(movie_model_mild)
 ```
 ### 3. Assess

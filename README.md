@@ -100,8 +100,31 @@ movie_model_strong = language_model(strong_movie_review_data,
                                       outcome = "valence",
                                       outcomeType = "binary",
                                       text = "cleanText")
+```
+
+``` r
 summary(movie_model_strong)
 ```
+
+    ## Call:: language_model(input = strong_movie_review_data, outcome = "valence", outcomeType = "binary", text = "cleanText")
+    ## 
+    ## Number of language samples provided (n): 2000 
+    ## Ngrams used: 1 
+    ## Total number of ngrams in dataset: 434252 
+    ## Number of unique ngrams in dataset to serve as predictors (p): 23413 
+    ## Number of predictive ngrams in final model: 180 
+    ##     Number of ngrams predicting 'Negative': 93
+    ##     Number of ngrams predicting 'Positive': 87
+    ## 
+    ## Cross-validated Binomial Deviance at 'lambda.min' = 0.604
+    ## 
+    ## Various model evaluation metrics:
+    ##    (Caution: these were obtained by using the cross-validated model to predict outcomes based on the original dataset)
+    ## 
+    ## Predictive accuracy: 0.929 
+    ## Kappa: 0.858 
+    ## Log loss: 0.223 
+    ## ROC AUC: 0.979
 
 Let’s compare our model with one based on another dataset:
 `mild_movie_review_data`. This dataset is very similar, except these
@@ -114,8 +137,31 @@ movie_model_mild = language_model(mild_movie_review_data,
                                       outcome = "valence",
                                       outcomeType = "binary",
                                       text = "cleanText")
+```
+
+``` r
 summary(movie_model_mild)
 ```
+
+    ## Call:: language_model(input = mild_movie_review_data, outcome = "valence", outcomeType = "binary", text = "cleanText")
+    ## 
+    ## Number of language samples provided (n): 2000 
+    ## Ngrams used: 1 
+    ## Total number of ngrams in dataset: 522970 
+    ## Number of unique ngrams in dataset to serve as predictors (p): 26724 
+    ## Number of predictive ngrams in final model: 335 
+    ##     Number of ngrams predicting 'Negative': 175
+    ##     Number of ngrams predicting 'Positive': 160
+    ## 
+    ## Cross-validated Binomial Deviance at 'lambda.min' = 1.166
+    ## 
+    ## Various model evaluation metrics:
+    ##    (Caution: these were obtained by using the cross-validated model to predict outcomes based on the original dataset)
+    ## 
+    ## Predictive accuracy: 0.845 
+    ## Kappa: 0.69 
+    ## Log loss: 0.405 
+    ## ROC AUC: 0.925
 
 ### 3. Assess
 
@@ -127,7 +173,7 @@ For binary models, `plot_roc` will give us a good visual overview:
 plot_roc(movie_model_strong, movie_model_mild, individual_plot = FALSE, facet_plot = FALSE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 As we can see, language does appear to predict review valence for both
 datasets - but it’s higher for strong reviews! But is this significant?
@@ -155,7 +201,7 @@ plot. Let’s look at the top 15:
 plot_predictor_words(movie_model_strong, movie_model_mild, topX = 15, print_summary = FALSE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
 What do these words mean in context? We can investigate with the network
 plotting tools. Let’s take a look at the movie\_model\_strong networks:
@@ -168,4 +214,4 @@ network_table = node_edge(movie_model_strong, removeStopwords = TRUE)
 word_network(network_table, model=movie_model_strong, topX=50)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
