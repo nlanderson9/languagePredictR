@@ -13,7 +13,7 @@ assess_models(...)
 An object of the type "modelAssessment"
 }
 \description{
-This function assesses one or more models created by the \code{\link{language_model}} function.
+This function is deprecated; all dependent functions (e.g. \code{plot_roc()} or \code{plot_predictor_words}) now take individual models as arguments. This function assesses one or more models created by the \code{\link{language_model}} function.
 }
 \details{
 The primary purpose of this function is to be used with other functions included in this package, such as plot_roc() or predictor_word_plots()

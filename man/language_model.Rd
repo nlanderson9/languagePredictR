@@ -5,10 +5,10 @@
 \title{Create Language Model}
 \usage{
 language_model(
-  inputDataframe,
-  outcomeVariableColumnName,
-  outcomeVariableType,
-  textColumnName,
+  input,
+  outcome,
+  outcomeType,
+  text,
   ngrams = "1",
   dfmWeightScheme = "count",
   lossMeasure = "deviance",
@@ -21,13 +21,13 @@ language_model(
 )
 }
 \arguments{
-\item{inputDataframe}{A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)}
+\item{input}{A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)}
 
-\item{outcomeVariableColumnName}{A string consisting of the column name for the outcome variable in \code{inputDataframe}}
+\item{outcome}{A string consisting of the column name for the outcome variable in \code{inputDataframe}}
 
-\item{outcomeVariableType}{A string consisting of the type of outcome variable being used - options are "binary" or "continuous"}
+\item{outcomeType}{A string consisting of the type of outcome variable being used - options are "binary" or "continuous"}
 
-\item{textColumnName}{A string consisting of the column name for the text data in \code{inputDataframe}}
+\item{text}{A string consisting of the column name for the text data in \code{inputDataframe}}
 
 \item{ngrams}{A string defining the ngrams to serve as predictors in the model. Defaults to "1". For more information, see the \code{okens_ngrams} function in the \code{quanteda} package}
 
@@ -43,7 +43,7 @@ language_model(
 
 \item{permutationK}{The number of permutations to run in a permutation test. Only used if \code{permutePValue = TRUE}. Defaults to 1000.}
 
-\item{permuteByGroup}{A string consisting of the column name defining a grouping variable in the dataset (usually a participant number). This means that when permutations are randomized, they will permute items on a group level rather than trial level. Default is NULL (no group variable considered).}
+\item{permuteByGroup}{A string consisting of the column name defining a grouping variable in the dataset (often a participant number). This means that when permutations are randomized, they will permute items on a group level rather than trial level. Default is NULL (no group variable considered).}
 
 \item{progressBar}{Show a progress bar. Defaults to TRUE.}
 }
@@ -70,18 +70,22 @@ movie_review_data1$cleanText = clean_text(movie_review_data1$text)
 
 # Using language to predict "Positive" vs. "Negative" reviews
 movie_model_valence = language_model(movie_review_data1,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText")
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText")
+
+summary(movie_model_valence)
 
 # Using language to predict 1-10 scale ratings,
 # but using both unigrams and bigrams, as well as a proportion weighting scheme
 movie_model_rating = language_model(movie_review_data1,
-                                    outcomeVariableColumnName = "rating",
-                                    outcomeVariableType = "continuous",
-                                    textColumnName = "cleanText",
+                                    outcomeV = "rating",
+                                    outcomeType = "continuous",
+                                    textC = "cleanText",
                                     ngrams = "1:2",
                                     dfmWeightScheme = "prop")
+
+summary(movie_model_rating)
 }
 
 }

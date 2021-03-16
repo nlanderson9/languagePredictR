@@ -97,52 +97,44 @@ variable)
 
 ``` r
 movie_model_strong = language_model(strong_movie_review_data,
-                                      outcomeVariableColumnName = "valence",
-                                      outcomeVariableType = "binary",
-                                      textColumnName = "cleanText")
+                                      outcome = "valence",
+                                      outcomeType = "binary",
+                                      text = "cleanText")
+summary(movie_model_strong)
 ```
 
-### 3. Assess
-
-There’s not much we can do with this model output without assessing it.
-When we assess the model, we can do so in conjunction with other models
-in order to compare them. Let’s compare our model with one based on
-another dataset: `mild_movie_review_data`. This dataset is very similar,
-except these reviews are more “mild” (4 and 7, instead of 1 and 10).
-Maybe people use stronger, and more predictive, language for stronger
-reviews?
+Let’s compare our model with one based on another dataset:
+`mild_movie_review_data`. This dataset is very similar, except these
+reviews are more “mild” (4 and 7, instead of 1 and 10). Maybe people use
+stronger, and more predictive, language for stronger reviews?
 
 ``` r
 mild_movie_review_data$cleanText = clean_text(mild_movie_review_data$text)
 movie_model_mild = language_model(mild_movie_review_data,
-                                      outcomeVariableColumnName = "valence",
-                                      outcomeVariableType = "binary",
-                                      textColumnName = "cleanText")
+                                      outcome = "valence",
+                                      outcomeType = "binary",
+                                      text = "cleanText")
+summary(movie_model_mild)
 ```
 
-Now, we can assess our models:
+### 3. Assess
 
-``` r
-movie_assessment = assess_models(movie_model_strong, movie_model_mild)
-```
-
-This “model\_assessment” object can be used with a number of functions
-to help us see what’s going on.
+A number of functions are provided to help us see what’s going on.
 
 For binary models, `plot_roc` will give us a good visual overview:
 
 ``` r
-plot_roc(movie_assessment, individual_plot = FALSE, facet_plot = FALSE)
+plot_roc(movie_model_strong, movie_model_mild, individual_plot = FALSE, facet_plot = FALSE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 As we can see, language does appear to predict review valence for both
 datasets - but it’s higher for strong reviews! But is this significant?
 Let’s check:
 
 ``` r
-test_output = analyze_roc(movie_assessment, plot=FALSE)
+test_output = analyze_roc(movie_model_strong, movie_model_mild, plot=FALSE)
 test_output
 ```
 
@@ -160,10 +152,10 @@ Even with the number of items reduced, it can sometimes be a lot to
 plot. Let’s look at the top 15:
 
 ``` r
-plot_predictor_words(movie_assessment, topX = 15, print_summary = FALSE)
+plot_predictor_words(movie_model_strong, movie_model_mild, topX = 15, print_summary = FALSE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
 
 What do these words mean in context? We can investigate with the network
 plotting tools. Let’s take a look at the movie\_model\_strong networks:
@@ -176,4 +168,4 @@ network_table = node_edge(movie_model_strong, removeStopwords = TRUE)
 word_network(network_table, model=movie_model_strong, topX=50)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->

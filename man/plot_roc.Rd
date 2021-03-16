@@ -5,7 +5,7 @@
 \title{Plot ROC curves}
 \usage{
 plot_roc(
-  modelAssessment,
+  ...,
   individual_plot = TRUE,
   combined_plot = TRUE,
   facet_plot = TRUE,
@@ -27,7 +27,7 @@ plot_roc(
 )
 }
 \arguments{
-\item{modelAssessment}{The output of the \code{\link{assess_models}} function}
+\item{...}{Output(s) of the \code{\link{language_model}}, \code{\link{comparison_model}}, or \code{\link{test_language_model}} functions}
 
 \item{individual_plot}{If TRUE, graphs individual ROC curves for each model. Defaults to TRUE.}
 
@@ -80,26 +80,24 @@ mild_movie_review_data$cleanText = clean_text(mild_movie_review_data$text)
 # Using language to predict "Positive" vs. "Negative" reviews
 # Only for strong reviews (ratings of 1 or 10)
 movie_model_strong = language_model(strong_movie_review_data,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText",
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText",
                                      progressBar = FALSE)
 
 # Using language to predict "Positive" vs. "Negative" reviews
 # Only for mild reviews (ratings of 4 or 7)
 movie_model_mild = language_model(mild_movie_review_data,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText",
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText",
                                      progressBar = FALSE)
 
-# Create the model assessment
-movie_assessment = assess_models(movie_model_strong, movie_model_mild)
 
 # Plot ROC curves
-plot_roc(movie_assessment)
+plot_roc(movie_model_strong, movie_model_mild)
 }
 }
 \seealso{
-\code{\link{assess_models}}
+\code{\link{language_model}}, \code{\link{comparison_model}}, \code{\link{test_language_model}}
 }

@@ -5,7 +5,7 @@
 \title{Plot Predictor Words}
 \usage{
 plot_predictor_words(
-  modelAssessment,
+  ...,
   topX,
   colors = c("blue", "orange"),
   plot_titles,
@@ -18,7 +18,7 @@ plot_predictor_words(
 )
 }
 \arguments{
-\item{modelAssessment}{The output of the \code{\link{assess_models}} function}
+\item{...}{Output(s) of the \code{\link{language_model}} function}
 
 \item{topX}{The number of most-predictive words to plot}
 
@@ -52,26 +52,22 @@ mild_movie_review_data$cleanText = clean_text(mild_movie_review_data$text)
 # Using language to predict "Positive" vs. "Negative" reviews
 # Only for strong reviews (ratings of 1 or 10)
 movie_model_strong = language_model(strong_movie_review_data,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText",
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText",
                                      progressBar = FALSE)
 
 # Using language to predict "Positive" vs. "Negative" reviews
 # Only for mild reviews (ratings of 4 or 7)
 movie_model_mild = language_model(mild_movie_review_data,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText",
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText",
                                      progressBar = FALSE)
 
-# Create the model assessment
-movie_assessment = assess_models(movie_model_strong, movie_model_mild)
-
 # Analyze ROC curves
-plot_predictor_words(movie_assessment)
-#Test!
+plot_predictor_words(movie_model_strong, movie_model_mild)
 }
 \seealso{
-\code{\link{assess_models}}
+\code{\link{language_model}}
 }

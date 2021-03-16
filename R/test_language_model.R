@@ -1,40 +1,53 @@
 #' testAssessment Class
 #'
+#' @slot call The function called to generate this model, with all arguments specified by the user
+#' @slot data_text The text input to test the model
+#' @slot data_outcome The outcome variable input to test the model
 #' @slot type Model type, "binary" or "continuous"
-#' @slot model_labels Label names and basic info for each model in the assessment
-#' @slot auc_polygon_df Dataframe for plotting the AUC polygon
-#' @slot roc_ci_df Dataframe for plotting the ROC confidence intervals
-#' @slot roc_curve_df Dataframe for plotting the ROC curves
-#' @slot auc_ci_labels_df Dataframe for AUC labels
-#' @slot auc_tests Dataframe of significance tests for AUCs
-#' @slot cat_data Dataframe of predictors (word engrams) with their model weights
+#' @slot text The name of the column in the test dataframe containing the data_text
+#' @slot outcome The name of the column in the test dataframe containing the data_outcome
+#' @slot ngrams The ngrams used to generate the tokens
+#' @slot dfmWeightScheme The weight scheme used to create the document-frequency matrix
+#' @slot x The document-frequency matrix
+#' @slot y The dependent (outcome) variable
+#' @slot predicted_y The predicted outcomes based on the model and test data
+#' @slot predicted_probabilities (If binary) The predicted probabilities of the outcomes based on the model and test data
+#' @slot roc (If binary) The ROC calculated using the predicted_y
+#' @slot roc_ci (If binary) The boostrapped confidence interval calculated for the ROC
+#' @slot corr (If continuous) The correlation using the predicted_y
+#' @slot level0 The bottom/first level of a binary variable, or the lowest value of a continuous variable
+#' @slot level1 The top/second level of a binary variable, or the highest value of a continuous variable
+#' @slot trainedModel The name of the model used for the test
+#' @slot original_predictive_ngrams The list of ngram predictors from the model
+#' @slot ngrams_present The number of original_predictive_ngrams that appear in the test lanuage sample
 #'
 #' @export testAssessment
 #' @exportClass testAssessment
 #'
-testAssessment = setClass("testAssessment", slots = c("type", "model_labels", "auc_polygon_df", "roc_ci_df", "roc_curve_df", "auc_ci_labels_df", "auc_tests", "cat_data"))
+
+testAssessment = setClass("testAssessment", slots = c("call", "data_text", "data_outcome", "type", "text", "outcome", "ngrams", "dfmWeightScheme", "x", "y", "predicted_y", "predicted_probabilities", "roc", "roc_ci", "corr", "level0", "level1", "trainedModel", "original_predictive_ngrams", "ngrams_present"))
 
 
 #' @title Test Language Model
 #'
 #' @description This function tests a model created by the \code{\link{language_model}} function on a new dataset
 #'
-#' @param inputDataframe A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)
-#' @param outcomeVariableColumnName A string consisting of the column name for the outcome variable in \code{inputDataframe}
-#' @param textColumnName A string consisting of the column name for the text data in \code{inputDataframe}
+#' @param input A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)
+#' @param outcome A string consisting of the column name for the outcome variable in \code{inputDataframe}
+#' @param text A string consisting of the column name for the text data in \code{inputDataframe}
 #' @param trainedModel A trained model created by the \code{\link{language_model}} function
 #' @param ngrams A string defining the ngrams to serve as predictors in the model. Defaults to "1". For more information, see the \code{okens_ngrams} function in the \code{quanteda} package
 #' @param dfmWeightScheme A string defining the weight scheme you wish to use for constructing a document-frequency matrix. Default is "count". For more information, see the \code{dfm_weight} function in the \code{quanteda} package
-#' @param lambda A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package
+#' @param progressBar Show a progress bar. Defaults to TRUE.
 #'
 #' @return An object of the type "testAssessment"
 #'
-#' @seealso \code{\link{language_model}} and \code{\link{assess_models}}
+#' @seealso \code{\link{language_model}}
 #'
 #' @import quanteda
-#' @import glmnet
 #' @import pROC
-#' @importFrom methods setClass new
+#' @importFrom stats cor.test
+#' @importFrom methods setClass new as
 #' @importFrom rlang .data
 #'
 #' @export
@@ -48,44 +61,56 @@ testAssessment = setClass("testAssessment", slots = c("type", "model_labels", "a
 #' # Train a model on the \code{movie_review_data1} dataset
 #' # Using language to predict "Positive" vs. "Negative" reviews
 #' movie_model_valence = language_model(movie_review_data1,
-#'                                      outcomeVariableColumnName = "valence",
-#'                                      outcomeVariableType = "binary",
-#'                                      textColumnName = "cleanText")
+#'                                      outcome = "valence",
+#'                                      outcomeType = "binary",
+#'                                      text = "cleanText")
 #'
 #' # Test the model on the \code{movie_review_data2} dataset
-#' movie_model_rating = test_language_model(movie_review_data2,
-#'                                     outcomeVariableColumnName = "valence",
-#'                                     textColumnName = "cleanText",
+#' movie_model_valence_test = test_language_model(movie_review_data2,
+#'                                     outcome = "valence",
+#'                                     text = "cleanText",
 #'                                     trainedModel = movie_model_valence)
+#' summary(movie_model_valence_test)
 #' }
 #'
 #' @details
-#' This function is effectively a special instance of the \code{\link{assess_models}} function. Instead of being provided with two independently-specified models, the two assessed models are the training model and the testing model.
-#' This allows for assessing how well a trained language model generalizes to other inputs - this function allows for comparisons between the models using many of the same functions that can be used with \code{\link{assess_models}}.
+#' This function is effectively a special version of the \code{\link{language_model}} function. Instead of creating a new model, the outputs are based on the results of testing a new, independent dataset using an existing model.
+#' This allows for assessing how well a trained language model generalizes to other inputs - this function allows for comparisons between the models using many of the same functions that can be used with \code{\link{language_model}}.
 
-test_language_model = function(inputDataframe, outcomeVariableColumnName, textColumnName, trainedModel, ngrams="1", dfmWeightScheme="count",lambda="lambda.min") {
-  td = inputDataframe
+test_language_model = function(input, outcome, text, trainedModel, ngrams="1", dfmWeightScheme="count", progressBar=TRUE) {
+
+  call = match.call()
+
+  td = input
+
+  if (!is.data.frame(td)) {
+    stop("The `input` argument must be a dataframe.")
+  }
 
   if (trainedModel@type == "binary") {
-    if (!is.factor(td[[outcomeVariableColumnName]])) {
+    if (!is.factor(td[[outcome]])) {
       stop("Binary outcome variable must be type 'factor'")
     }
     else {
-      if (nlevels(td[[outcomeVariableColumnName]]) != 2) {
+      if (nlevels(td[[outcome]]) != 2) {
         stop("Binary outcome variable must have exactly 2 levels")
       }
-      level0 = levels(td[[outcomeVariableColumnName]])[1]
-      level1 = levels(td[[outcomeVariableColumnName]])[2]
-      td$cat = as.numeric(td[[outcomeVariableColumnName]]) - 1
+      level0 = levels(td[[outcome]])[1]
+      level1 = levels(td[[outcome]])[2]
+      td$cat = as.numeric(td[[outcome]]) - 1
     }
   }
   else if (trainedModel@type == "continuous") {
-    if (!is.numeric(td[[outcomeVariableColumnName]])) {
+    if (!is.numeric(td[[outcome]])) {
       stop("Continuous outcome variable must be be type 'numeric'")
     }
-    level0 = paste("low-", td[[outcomeVariableColumnName]], sep="")
-    level1 = paste("high-", td[[outcomeVariableColumnName]], sep="")
-    td$cat = td[[outcomeVariableColumnName]]
+    level0 = paste("low-", td[[outcome]], sep="")
+    level1 = paste("high-", td[[outcome]], sep="")
+    td$cat = td[[outcome]]
+  }
+
+  if(!class(trainedModel) == "langModel1") {
+    stop("The `trainedModel` argument must be an output from `language_model`.")
   }
 
   if (suppressWarnings(is.na(as.numeric(ngrams[1])))) {
@@ -95,19 +120,35 @@ test_language_model = function(inputDataframe, outcomeVariableColumnName, textCo
     }
   }
 
+  if (ngrams != trainedModel@ngrams) {
+    result = askYesNo(paste0("The argument `ngrams` for this dataset (`",ngrams,"`) does not match the ngrams used to create the original model (`",trainedModel@ngrams,"`). This is not advised - are you sure you want to continue?"))
+    if (is.na(result)) {
+      stop("Function aborted.")
+    }
+    if (!result) {
+      stop("Function aborted.")
+    }
+  }
+
   if (!(dfmWeightScheme %in% c("count", "prop", "propmax", "logcount", "boolean", "augmented", "logave"))) {
     stop("Your `dfmWeightScheme` argument should include one of the valid 'scheme' options for the 'quanteda' function 'dfm_weight'.\nThese include:\n'count'\n'prop'\n'propmax'\n'logcount'\n'boolean'\n'augmented'\n'logave'")
   }
 
-  if (!(lambda %in% c("lambda.min", "lambda.1se"))) {
-    stop("Your `lambda` argument should be either 'lambda.min' (for the value of lambda that results in the minimum cross-validation error) or 'lambda.1se' (for the value of lambda 1 standard error above lambda.min).")
+  if (dfmWeightScheme != trainedModel@dfmWeightScheme) {
+    result = askYesNo(paste0("The argument `dfmWeightScheme` for this dataset (`",dfmWeightScheme,"`) does not match the dfmWeightScheme used to create the original model (`",trainedModel@dfmWeightScheme,"`). This is not advised - are you sure you want to continue?"))
+    if (is.na(result)) {
+      stop("Function aborted.")
+    }
+    if (!result) {
+      stop("Function aborted.")
+    }
   }
 
 
   m1dat<-subset(td, !is.na(cat))
 
   #***************CREATE THE DFM*************************
-  corpus1<-corpus(m1dat[[textColumnName]])
+  corpus1<-corpus(m1dat[[text]])
 
   if (grepl(":", ngrams)) {
     splits = strsplit(ngrams, ":")[[1]]
@@ -124,173 +165,141 @@ test_language_model = function(inputDataframe, outcomeVariableColumnName, textCo
 
 
   x<-as.matrix(dfm1)
+  x = as(x, "dgCMatrix")
 
   #the dependent variable for fitting
   y<-m1dat$cat
 
+  if(progressBar){
+    roc_progress = "text"
+  }
+  else {
+    roc_progress = "none"
+  }
 
-
-
-
-
-
-
+  predicted_y = as.numeric(predict(trainedModel@cv, newx=x, s=trainedModel@lambda))
   if (trainedModel@type == "binary") {
-
-    results_matrix = data.frame(matrix(nrow=0, ncol=8))
-    colnames(results_matrix) = c("model", "auc", "auc_ci", "predictive_acc", "high_predictor_1", "high_predictor_2", "low_predictor_1", "low_predictor_2")
-
-    model_labels = data.frame(matrix(ncol=7,nrow=0))
-    colnames(model_labels) = c("name","LASSO_model", "auc", "ci_lower", "ci_upper", "cat0title", "cat1title")
-
-    roc_plot_data = data.frame(matrix(ncol=2,nrow=0))
-    colnames(roc_plot_data) = c("specificities", "sensitivities")
-
-    roc_ci_plot_data = data.frame(matrix(ncol=4, nrow=0))
-    colnames(roc_ci_plot_data) = c("percent2p5", "percent50", "percent97p5", "sensitivities")
-
-    roc_list = list()
-
-    cat_data = data.frame(matrix(ncol=4,nrow=0))
-    colnames(cat_data) = c("words", "weights", "class", "model")
-
-    for (i in 1:2) {
-      if (i == 1) {
-        predictor<- as.numeric(predict(trainedModel@cv,newx=trainedModel@x,s=trainedModel@lambda))
-        response = trainedModel@y
-        model_name = as.character(substitute(trainedModel))
-      }
-      else if (i == 2) {
-        predictor<- as.numeric(predict(trainedModel@cv,newx=x,s=trainedModel@lambda))
-        response = y
-        model_name = as.character(substitute(inputDataframe))
-      }
-      roc_data <- suppressMessages(roc(response,predictor, ci=TRUE))
-      roc_list[[model_name]] = roc_data
-      roc_ci_data = ci.sp(roc_data, sensitivities=seq(0,1,.01))
-
-      if (trainedModel@type == "binary") {
-        cat1title = paste('Words predicting\n"',trainedModel@level1, '" responses', sep="")
-        cat0title = paste('Words predicting\n"',trainedModel@level0, '" responses', sep="")
-      }
-      else {
-        cat1title = paste('Words predicting\n"high-',trainedModel@outcome, '" responses', sep="")
-        cat0title = paste('Words predicting\n"low-',trainedModel@outcome, '" responses', sep="")
-      }
-
-      cat0data = trainedModel@cat0raw
-      cat1data = trainedModel@cat1raw
-      cat0data$class = "cat0"
-      cat1data$class = "cat1"
-      cat_data_temp = rbind(cat0data, cat1data)
-      cat_data_temp$model = model_name
-      cat_data = rbind(cat_data, cat_data_temp)
-
-
-
-      roc_data_formatted = data.frame(specificities=roc_data$specificities, sensitivities=roc_data$sensitivities)
-      roc_data_formatted$model = model_name
-      roc_ci_data_formatted = as.data.frame(roc_ci_data)
-      roc_ci_data_formatted$sensitivities = as.numeric(rownames(roc_ci_data_formatted))
-      colnames(roc_ci_data_formatted) = c("percent2p5", "percent50", "percent97p5", "sensitivities")
-      roc_ci_data_formatted$model = model_name
-      roc_plot_data = rbind(roc_plot_data, roc_data_formatted)
-      roc_ci_plot_data = rbind(roc_ci_plot_data, roc_ci_data_formatted)
-
-
-
-      temp_frame = data.frame(name=model_name, LASSO_model=TRUE, auc = roc_data$auc, ci_lower = roc_data$ci[1], ci_upper = roc_data$ci[3], cat0title = cat0title, cat1title=cat1title)
-      model_labels = rbind(model_labels, temp_frame)
+    predicted_probabilities = as.numeric(predict(trainedModel@cv, newx=x, s=trainedModel@lambda, type="response"))
+    roc = suppressMessages(roc(y, predicted_y, ci=TRUE))
+    if(progressBar){
+      cat("Boostrapping ROC...")
     }
+    roc_ci = ci.sp(roc, sensitivities=seq(0,1,.01), progress=roc_progress)
+    corr = NA
+  }
+  else if (trainedModel@type == "continuous") {
+    corr = cor.test(y, predicted_y)
+    predicted_probabilities = NA
+    roc = NA
+    roc_ci = NA
+    corr = NA
+  }
 
-    roc_plot_data$model = factor(roc_plot_data$model, levels = model_labels$name)
-    roc_ci_plot_data$model = factor(roc_ci_plot_data$model, levels = model_labels$name)
-    lowest_auc_model = model_labels$name[which.min(model_labels$auc)]
+  original_predictive_ngrams = c(trainedModel@cat0raw$words, trainedModel@cat1raw$words)
 
-    box_df = data.frame(polygon.x = c(0,0,1,1,0), polygon.y = c(0,1,1,0,0))
-
-    auc_df = data.frame(matrix(ncol=3,nrow=0))
-    colnames(auc_df) = c("sensitivities", "specificities", "model")
-    for (j in 1:nrow(model_labels)) {
-      auc_df_add = subset(roc_plot_data, model == model_labels$name[j])
-      auc_extra = data.frame(sensitivities = c(1,0,0), specificities = c(0,0,1), model=rep(model_labels$name[j],3))
-      auc_df = rbind(auc_df, auc_df_add, auc_extra)
+  ngrams_present = 0
+  for (i in 1:length(original_predictive_ngrams)) {
+    if(nrow(kwic(corpus1, original_predictive_ngrams[i] > 0))) {
+      ngrams_present = ngrams_present + 1
     }
+  }
 
-    auc_labels = data.frame(matrix(ncol=4,nrow=0))
-    colnames(auc_labels) = c("model", "label_text", "x", "y")
-    for (j in 1:nrow(model_labels)) {
-      model = model_labels$name[j]
-      label_text = paste("AUC: ",round(model_labels$auc[j],3), "\nCI: (", round(model_labels$ci_lower[j],3), "-", round(model_labels$ci_upper[j],3),")",sep="")
-      temp_frame = data.frame(model=model, label_text=label_text, x=.4, y=.6-(.1*j))
-      auc_labels = rbind(auc_labels, temp_frame)
+  output = new("testAssessment", call=call, data_text=input[[text]], data_outcome=input[[outcome]], type=trainedModel@type, text=text, outcome=outcome, ngrams=ngrams, dfmWeightScheme=dfmWeightScheme, x=x, y=y, predicted_y=predicted_y, predicted_probabilities=predicted_probabilities, roc=roc, roc_ci=roc_ci, corr=corr, level0=level0, level1=level1, trainedModel=deparse(substitute(trainedModel)), original_predictive_ngrams=original_predictive_ngrams, ngrams_present=ngrams_present)
+  return(output)
+}
+
+
+
+
+
+
+#' Summary (testAssessment)
+#'
+#' @param object The testAssessment object to summarize
+#' @param ... Additional arguments
+#'
+#' @export
+#'
+#' @importFrom yardstick metrics
+#'
+#' @method summary testAssessment
+#' @rdname testAssessment
+
+summary.testAssessment = function(object, ...){
+
+  original=predicted_prob=predicted_class=predicted=NULL
+
+  corpus_object = quanteda::corpus(object@data_text)
+
+  tokens_object = corpus_object %>% quanteda::tokens()
+
+  if (grepl(":", object@ngrams)) {
+    splits = strsplit(object@ngrams, ":")[[1]]
+    ngram_tokens = tokens_object %>% quanteda::tokens_ngrams(n=splits[1]:splits[2],concatenator = " ")
+  }
+  else {
+    ngram_tokens = tokens_object %>% quanteda::tokens_ngrams(n=object@ngrams,concatenator = " ")
+  }
+
+  total_tokens = ngram_tokens %>% ntoken() %>% sum()
+  unique_tokens = ncol(object@x)
+
+
+  call_string = deparse(object@call)
+  call_string = paste(call_string, collapse = " ")
+  call_string = gsub("\\s+", " ", call_string)
+  call_string = paste("Call:", call_string)
+
+  cat(paste0(call_string,"\n\n"))
+  cat(paste("Number of language samples provided (n):", nrow(object@x),"\n"))
+  cat(paste("Ngrams used:", object@ngrams,"\n"))
+  cat(paste("Total number of ngrams in dataset:", total_tokens,"\n"))
+  cat(paste("Number of unique ngrams in dataset:", ncol(object@x),"\n"))
+  cat(paste("Number of predictive ngrams included in the original model:", length(object@original_predictive_ngrams),"\n"))
+  cat(paste("Number of predictive ngrams appearing in dataset:",object@ngrams_present,"/",length(object@original_predictive_ngrams),"\n\n"))
+
+  cat("Various model evaluation metrics:\n")
+  cat("   (These were obtained by using the original cross-validated model to predict outcomes based on the current dataset)\n\n")
+  if (object@type == "binary") {
+    metric_dataframe = data.frame(original=object@y, predicted_prob=object@predicted_probabilities)
+    metric_dataframe$predicted_class = ifelse(metric_dataframe$predicted_prob >=.5, 1, 0)
+    metric_dataframe$original = as.factor(metric_dataframe$original)
+    metric_dataframe$predicted_class = as.factor(metric_dataframe$predicted_class)
+    if (yardstick::roc_auc(metric_dataframe, original, predicted_prob)$.estimate < .5) {
+      metric_dataframe$original = factor(metric_dataframe$original, levels=c(levels(metric_dataframe$original)[2], levels(metric_dataframe$original)[1]))
+      metric_dataframe$predicted_class = factor(metric_dataframe$predicted_class, levels=c(levels(metric_dataframe$predicted_class)[2], levels(metric_dataframe$predicted_class)[1]))
     }
+    metric_results = yardstick::metrics(metric_dataframe, original, predicted_class, predicted_prob)
 
+    predictive_accuracy = metric_results$.estimate[1]
+    kappa = metric_results$.estimate[2]
+    log_loss = metric_results$.estimate[3]
+    roc_auc = metric_results$.estimate[4]
 
+    print_pred_acc = signif(predictive_accuracy, 3)
+    print_kappa = signif(kappa, 3)
+    print_log_loss = signif(log_loss, 3)
+    print_auc = signif(roc_auc, 3)
 
-    roc_plot_data_all = CreateAllFacet(roc_plot_data, "model")
-    roc_ci_plot_data_all = CreateAllFacet(roc_ci_plot_data, "model")
+    cat(paste("Predictive accuracy:",print_pred_acc,"\n"))
+    cat(paste("Kappa:",print_kappa,"\n"))
+    cat(paste("Log loss:",print_log_loss,"\n"))
+    cat(paste("ROC AUC:",print_auc,"\n"))
+  }
+  else if (object@type == "continuous") {
+    metric_dataframe = data.frame(original=object@y, predicted=object@predicted_y)
+    metric_results = yardstick::metrics(metric_dataframe, original, predicted)
 
-    auc_df$facet = auc_df$model
-    auc_df_add = subset(roc_plot_data, model == lowest_auc_model)
-    auc_df_add$facet = "all"
-    auc_extra = data.frame(sensitivities = c(1,0,0), specificities = c(0,0,1), model=rep(model_labels$name[j],3), facet=rep("all",3))
-    auc_df = rbind(auc_df, auc_df_add, auc_extra)
+    rmse = metric_results$.estimate[1]
+    rsq = metric_results$.estimate[2]
+    mae = metric_results$.estimate[3]
 
-    roc_plot_data_all$facet = factor(roc_plot_data_all$facet, levels = c(model_labels$name, "all"))
-    roc_ci_plot_data_all$facet = factor(roc_ci_plot_data_all$facet, levels = c(model_labels$name, "all"))
-    auc_df$facet = factor(auc_df$facet, levels = c(model_labels$name, "all"))
+    print_rmse = ifelse(rmse > 1, round(rmse,3), signif(rmse,3))
+    print_rsq = signif(rsq,3)
+    print_mae = ifelse(mae > 1, round(mae,3), signif(mae,3))
 
-    auc_labels$facet = "all"
-    auc_labels_new = auc_labels
-    auc_labels_new$facet = auc_labels_new$model
-    auc_labels_new$y=max(auc_labels_new$y)
-    auc_labels = rbind(auc_labels_new, auc_labels)
-    auc_labels$facet = factor(auc_labels$facet, levels = c(model_labels$name, "all"))
-
-
-
-
-
-
-    auc_tests = data.frame(matrix(ncol=5,nrow=0))
-    colnames(auc_tests) = c("model1", "model2", "model1_auc", "model2_auc", "p_value")
-
-
-    for (i in 1:length(roc_list)) {
-      for (j in (i+1):length(roc_list)) {
-        if (j > length(roc_list)) {
-          next
-        }
-        model1 = names(roc_list)[i]
-        model2 = names(roc_list)[j]
-        if (model1 == model2) {
-          next
-        }
-        model1_auc = roc_list[[i]]$auc
-        model2_auc = roc_list[[j]]$auc
-        p_value = roc.test(roc_list[[i]], roc_list[[j]])
-        temp_frame = data.frame(model1=model1, model2=model2, model1_auc=model1_auc, model2_auc=model2_auc, p_value=p_value$p.value)
-        auc_tests = rbind(auc_tests, temp_frame)
-      }
-    }
-
-    auc_tests$sig_TF = ifelse(auc_tests$p_value < .05, 1, 0)
-    auc_tests$sig_TF = factor(auc_tests$sig_TF, levels = c(0,1))
-    auc_tests$font = ifelse(auc_tests$sig_TF == 0, "plain", "bold")
-    auc_tests$size = ifelse(auc_tests$sig_TF == 0, 0, 1)
-    auc_tests$size = as.factor(auc_tests$size)
-    auc_tests$width = ifelse(auc_tests$sig_TF == 0, 1, .95)
-    auc_tests$height = ifelse(auc_tests$sig_TF == 0, 1, .95)
-    auc_tests$sig = ifelse(auc_tests$p_value >= .05, "NS", ifelse(auc_tests$p_value >= .01, "*", ifelse(auc_tests$p_value >= .001, "**", "***")))
-    auc_tests$model1 = factor(auc_tests$model1, levels = model_labels$name)
-    auc_tests$model2 = factor(auc_tests$model2, levels = rev(model_labels$name))
-
-
-
-
-
-    output = new("testAssessment", type="binary", model_labels=model_labels, auc_polygon_df=auc_df, roc_ci_df=roc_ci_plot_data_all, roc_curve_df=roc_plot_data_all, auc_ci_labels_df=auc_labels, auc_tests=auc_tests, cat_data=cat_data)
-    return(output)
+    cat(paste("Root mean squared error:",print_rmse,"\n"))
+    cat(paste("R-squared:",print_rsq,"\n"))
+    cat(paste("Mean absolute error:",print_mae,"\n"))
   }
 }

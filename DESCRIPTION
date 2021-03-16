@@ -45,5 +45,6 @@ Imports:
     stopwords,
     igraph,
     doParallel,
-    Matrix
+    Matrix,
+    yardstick
 RoxygenNote: 7.1.1

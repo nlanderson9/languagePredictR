@@ -11,17 +11,23 @@ langModel Class
 \section{Slots}{
 
 \describe{
+\item{\code{call}}{The function called to generate this model, with all arguments specified by the user}
+
 \item{\code{data_text}}{The text input to create the corpus/model}
 
-\item{\code{data_outcome}}{The outcome variabe input to create the model}
+\item{\code{data_outcome}}{The outcome variable input to create the model}
 
 \item{\code{type}}{Model type, "binary" or "continuous"}
 
-\item{\code{text}}{The name of the column in the original_dataframe containing the data_text}
+\item{\code{text}}{The name of the column in the input dataframe containing the data_text}
 
-\item{\code{outcome}}{The name of the column in the original_dataframe containing the data_outcome}
+\item{\code{outcome}}{The name of the column in the input dataframe containing the data_outcome}
 
 \item{\code{tokens}}{The list of tokens in the language corpus}
+
+\item{\code{ngrams}}{The ngrams used to generate the tokens}
+
+\item{\code{dfmWeightScheme}}{The weight scheme used to create the document-frequency matrix}
 
 \item{\code{x}}{The document-frequency matrix}
 
@@ -31,14 +37,38 @@ langModel Class
 
 \item{\code{lambda}}{The lambda value used}
 
+\item{\code{predicted_y}}{The predicted outcomes based on the model and original language data}
+
+\item{\code{predicted_probabilities}}{(If binary) The predicted probabilities of the outcomes based on the model and original language data}
+
+\item{\code{roc}}{(If binary) The ROC calculated using the predicted_y}
+
+\item{\code{roc_ci}}{(If binary) The boostrapped confidence interval calculated for the ROC}
+
+\item{\code{corr}}{(If continuous) The correlation using the predicted_y}
+
 \item{\code{level0}}{The bottom/first level of a binary variable, or the lowest value of a continuous variable}
 
 \item{\code{level1}}{The top/second level of a binary variable, or the highest value of a continuous variable}
 
-\item{\code{cat0raw}}{The predictors (word engrams) predicting the level0 outcome, with their model weights}
+\item{\code{cat0raw}}{The predictors (word ngrams) predicting the level0 outcome, with their model weights}
 
-\item{\code{cat1raw}}{The predictors (word engrams) predicting the level1 outcome, with their model weights}
+\item{\code{cat1raw}}{The predictors (word ngrams) predicting the level1 outcome, with their model weights}
 
 \item{\code{p_value}}{The p-value estimated via permutation test}
+
+\item{\code{lossMeasure}}{The loss measure chosen for the LASSO regression cross-validation}
+
+\item{\code{cvm_type}}{The loss measure - virtually always the same as lossMeasure except when the default "deviance" is specified}
+
+\item{\code{cvm}}{The value of the loss measure for the cross-validated model at the chosen lambda level}
+
+\item{\code{permuted_cvms}}{The value of the loss measure for each cross-validated model at the chosen lambda level across all randomized permutations}
+
+\item{\code{permutationK}}{The number of permutations conducted for permutation testing}
+
+\item{\code{minimum_p}}{The minimum p_value that can be achieved given the number permutationK specified}
+
+\item{\code{st_err_p}}{The standard error of the p_value based on the number permutationK specified}
 }}
 

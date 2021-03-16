@@ -5,21 +5,21 @@
 \title{Test Language Model}
 \usage{
 test_language_model(
-  inputDataframe,
-  outcomeVariableColumnName,
-  textColumnName,
+  input,
+  outcome,
+  text,
   trainedModel,
   ngrams = "1",
   dfmWeightScheme = "count",
-  lambda = "lambda.min"
+  progressBar = TRUE
 )
 }
 \arguments{
-\item{inputDataframe}{A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)}
+\item{input}{A dataframe containing a column with text data (character strings) and an outcome variable (numeric or two-level factor)}
 
-\item{outcomeVariableColumnName}{A string consisting of the column name for the outcome variable in \code{inputDataframe}}
+\item{outcome}{A string consisting of the column name for the outcome variable in \code{inputDataframe}}
 
-\item{textColumnName}{A string consisting of the column name for the text data in \code{inputDataframe}}
+\item{text}{A string consisting of the column name for the text data in \code{inputDataframe}}
 
 \item{trainedModel}{A trained model created by the \code{\link{language_model}} function}
 
@@ -27,7 +27,7 @@ test_language_model(
 
 \item{dfmWeightScheme}{A string defining the weight scheme you wish to use for constructing a document-frequency matrix. Default is "count". For more information, see the \code{dfm_weight} function in the \code{quanteda} package}
 
-\item{lambda}{A string defining the lambda value to be used. Default is "lambda.min". For more information, see the \code{cv.glmnet} function in the \code{glmnet} package}
+\item{progressBar}{Show a progress bar. Defaults to TRUE.}
 }
 \value{
 An object of the type "testAssessment"
@@ -36,8 +36,8 @@ An object of the type "testAssessment"
 This function tests a model created by the \code{\link{language_model}} function on a new dataset
 }
 \details{
-This function is effectively a special instance of the \code{\link{assess_models}} function. Instead of being provided with two independently-specified models, the two assessed models are the training model and the testing model.
-This allows for assessing how well a trained language model generalizes to other inputs - this function allows for comparisons between the models using many of the same functions that can be used with \code{\link{assess_models}}.
+This function is effectively a special version of the \code{\link{language_model}} function. Instead of creating a new model, the outputs are based on the results of testing a new, independent dataset using an existing model.
+This allows for assessing how well a trained language model generalizes to other inputs - this function allows for comparisons between the models using many of the same functions that can be used with \code{\link{language_model}}.
 }
 \examples{
 
@@ -48,18 +48,19 @@ movie_review_data2$cleanText = clean_text(movie_review_data2$text)
 # Train a model on the \code{movie_review_data1} dataset
 # Using language to predict "Positive" vs. "Negative" reviews
 movie_model_valence = language_model(movie_review_data1,
-                                     outcomeVariableColumnName = "valence",
-                                     outcomeVariableType = "binary",
-                                     textColumnName = "cleanText")
+                                     outcome = "valence",
+                                     outcomeType = "binary",
+                                     text = "cleanText")
 
 # Test the model on the \code{movie_review_data2} dataset
-movie_model_rating = test_language_model(movie_review_data2,
-                                    outcomeVariableColumnName = "valence",
-                                    textColumnName = "cleanText",
+movie_model_valence_test = test_language_model(movie_review_data2,
+                                    outcome = "valence",
+                                    text = "cleanText",
                                     trainedModel = movie_model_valence)
+summary(movie_model_valence_test)
 }
 
 }
 \seealso{
-\code{\link{language_model}} and \code{\link{assess_models}}
+\code{\link{language_model}}
 }

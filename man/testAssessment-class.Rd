@@ -11,20 +11,44 @@ testAssessment Class
 \section{Slots}{
 
 \describe{
+\item{\code{call}}{The function called to generate this model, with all arguments specified by the user}
+
+\item{\code{data_text}}{The text input to test the model}
+
+\item{\code{data_outcome}}{The outcome variable input to test the model}
+
 \item{\code{type}}{Model type, "binary" or "continuous"}
 
-\item{\code{model_labels}}{Label names and basic info for each model in the assessment}
+\item{\code{text}}{The name of the column in the test dataframe containing the data_text}
 
-\item{\code{auc_polygon_df}}{Dataframe for plotting the AUC polygon}
+\item{\code{outcome}}{The name of the column in the test dataframe containing the data_outcome}
 
-\item{\code{roc_ci_df}}{Dataframe for plotting the ROC confidence intervals}
+\item{\code{ngrams}}{The ngrams used to generate the tokens}
 
-\item{\code{roc_curve_df}}{Dataframe for plotting the ROC curves}
+\item{\code{dfmWeightScheme}}{The weight scheme used to create the document-frequency matrix}
 
-\item{\code{auc_ci_labels_df}}{Dataframe for AUC labels}
+\item{\code{x}}{The document-frequency matrix}
 
-\item{\code{auc_tests}}{Dataframe of significance tests for AUCs}
+\item{\code{y}}{The dependent (outcome) variable}
 
-\item{\code{cat_data}}{Dataframe of predictors (word engrams) with their model weights}
+\item{\code{predicted_y}}{The predicted outcomes based on the model and test data}
+
+\item{\code{predicted_probabilities}}{(If binary) The predicted probabilities of the outcomes based on the model and test data}
+
+\item{\code{roc}}{(If binary) The ROC calculated using the predicted_y}
+
+\item{\code{roc_ci}}{(If binary) The boostrapped confidence interval calculated for the ROC}
+
+\item{\code{corr}}{(If continuous) The correlation using the predicted_y}
+
+\item{\code{level0}}{The bottom/first level of a binary variable, or the lowest value of a continuous variable}
+
+\item{\code{level1}}{The top/second level of a binary variable, or the highest value of a continuous variable}
+
+\item{\code{trainedModel}}{The name of the model used for the test}
+
+\item{\code{original_predictive_ngrams}}{The list of ngram predictors from the model}
+
+\item{\code{ngrams_present}}{The number of original_predictive_ngrams that appear in the test lanuage sample}
 }}
 
