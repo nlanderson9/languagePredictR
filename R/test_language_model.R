@@ -109,7 +109,7 @@ test_language_model = function(input, outcome, text, trainedModel, ngrams="1", d
     td$cat = td[[outcome]]
   }
 
-  if(!class(trainedModel) == "langModel1") {
+  if(!class(trainedModel) == "langModel") {
     stop("The `trainedModel` argument must be an output from `language_model`.")
   }
 
