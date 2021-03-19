@@ -356,8 +356,8 @@ summary.langModel = function(object, ...){
 
   original=predicted_prob=predicted_class=predicted=NULL
 
-  summary_dataframe = list()
-  summary_dataframe[["model.name"]] = deparse(substitute(object))
+  summary_list = list()
+  summary_list[["model.name"]] = deparse(substitute(object))
 
   lossName = switch(object@cvm_type,
                     binomial_deviance="Binomial Deviance",
@@ -367,7 +367,7 @@ summary.langModel = function(object, ...){
                     class="Misclassification Error"
   )
 
-  summary_dataframe[["loss.metric"]] = lossName
+  summary_list[["loss.metric"]] = lossName
 
   if(object@cvm > 1) {
     print_cvm = round(object@cvm,3)
@@ -376,8 +376,8 @@ summary.langModel = function(object, ...){
     print_cvm = signif(object@cvm,3)
   }
 
-  summary_dataframe[["loss.metric.cv.lambda"]] = object@lambda
-  summary_dataframe[["loss.metric.cv.value"]] = object@cvm
+  summary_list[["loss.metric.cv.lambda"]] = object@lambda
+  summary_list[["loss.metric.cv.value"]] = object@cvm
 
   tokens_object = quanteda::corpus(object@data_text) %>% quanteda::tokens()
 
@@ -398,32 +398,32 @@ summary.langModel = function(object, ...){
   call_string = paste("Call::", call_string)
 
   cat(paste0(call_string,"\n\n"))
-  summary_dataframe[["call"]] = call_string
+  summary_list[["call"]] = call_string
   cat(paste("Number of language samples provided (n):", nrow(object@x),"\n"))
-  summary_dataframe[["language.samples"]] = nrow(object@x)
+  summary_list[["language.samples"]] = nrow(object@x)
   cat(paste("Outcome variable:", object@outcome,"\n"))
-  summary_dataframe[["outcome"]] = object@outcome
+  summary_list[["outcome"]] = object@outcome
   cat(paste("Ngrams used:", object@ngrams,"\n"))
-  summary_dataframe[["ngram"]] = object@ngrams
+  summary_list[["ngram"]] = object@ngrams
   cat(paste("Total number of ngrams in dataset:", total_tokens,"\n"))
-  summary_dataframe[["total.ngrams"]] = total_tokens
+  summary_list[["total.ngrams"]] = total_tokens
   cat(paste("Number of unique ngrams in dataset to serve as predictors (p):", ncol(object@x),"\n"))
-  summary_dataframe[["unique.ngrams"]] = ncol(object@x)
+  summary_list[["unique.ngrams"]] = ncol(object@x)
 
   cat(paste("Number of predictive ngrams in final model:", nrow(object@cat0raw)+nrow(object@cat1raw),"\n"))
-  summary_dataframe[["total.predictive.ngrams"]] = nrow(object@cat0raw)+nrow(object@cat1raw)
+  summary_list[["total.predictive.ngrams"]] = nrow(object@cat0raw)+nrow(object@cat1raw)
   cat(paste0("    Number of ngrams predicting '",object@level0,"': ",nrow(object@cat0raw),"\n"))
-  summary_dataframe[[paste0("predictive.ngrams.",object@level0)]] = nrow(object@cat0raw)
+  summary_list[[paste0("predictive.ngrams.",object@level0)]] = nrow(object@cat0raw)
   cat(paste0("    Number of ngrams predicting '",object@level1,"': ",nrow(object@cat1raw),"\n\n"))
-  summary_dataframe[[paste0("predictive.ngrams.",object@level1)]] = nrow(object@cat1raw)
+  summary_list[[paste0("predictive.ngrams.",object@level1)]] = nrow(object@cat1raw)
   cat(paste0("Cross-validated ",lossName," at '",object@lambda,"' = ",print_cvm,"\n\n"))
   if (!is.na(object@p_value)) {
     cat(paste0("Estimated p-value = ",signif(object@p_value,3)," (st.err. = ", signif(object@st_err_p,3),")\n"))
-    summary_dataframe[["estimated.p.value"]] = object@p_value
-    summary_dataframe[["standard.error.p.value"]] = object@st_err_p
+    summary_list[["estimated.p.value"]] = object@p_value
+    summary_list[["standard.error.p.value"]] = object@st_err_p
     cat(paste0("   (p-value and error are based on ",object@permutationK," permutations; minimum possible p = ",signif(object@minimum_p,3),")\n\n"))
-    summary_dataframe[["permutations.k"]] = object@permutationK
-    summary_dataframe[["minimum.possible.p.value"]] = object@minimum_p
+    summary_list[["permutations.k"]] = object@permutationK
+    summary_list[["minimum.possible.p.value"]] = object@minimum_p
   }
   cat("Various model evaluation metrics:\n")
   cat("   (Caution: these were obtained by using the cross-validated model to predict outcomes based on the original dataset)\n\n")
@@ -449,13 +449,13 @@ summary.langModel = function(object, ...){
     print_auc = signif(roc_auc, 3)
 
     cat(paste("Predictive accuracy:",print_pred_acc,"\n"))
-    summary_dataframe[["predictive.accuracy"]] = predictive_accuracy
+    summary_list[["predictive.accuracy"]] = predictive_accuracy
     cat(paste("Kappa:",print_kappa,"\n"))
-    summary_dataframe[["kappa"]] = kappa
+    summary_list[["kappa"]] = kappa
     cat(paste("Log loss:",print_log_loss,"\n"))
-    summary_dataframe[["log.loss"]] = log_loss
+    summary_list[["log.loss"]] = log_loss
     cat(paste("ROC AUC:",print_auc,"\n"))
-    summary_dataframe[["auc"]] = roc_auc
+    summary_list[["auc"]] = roc_auc
   }
   else if (object@type == "continuous" & nrow(object@cat0raw)+nrow(object@cat1raw) > 0) {
     metric_dataframe = data.frame(original=object@y, predicted=object@predicted_y)
@@ -470,15 +470,15 @@ summary.langModel = function(object, ...){
     print_mae = ifelse(mae > 1, round(mae,3), signif(mae,3))
 
     cat(paste("Root mean squared error:",print_rmse,"\n"))
-    summary_dataframe[["root.mean.squared.error"]] = rmse
+    summary_list[["root.mean.squared.error"]] = rmse
     cat(paste("R-squared:",print_rsq,"\n"))
-    summary_dataframe[["r.squared"]] = rsq
+    summary_list[["r.squared"]] = rsq
     cat(paste("Mean absolute error:",print_mae,"\n"))
-    summary_dataframe[["mean.absolute.error"]] = mae
+    summary_list[["mean.absolute.error"]] = mae
   }
   else if (nrow(object@cat0raw)+nrow(object@cat1raw) == 0) {
     cat("**No model evaluation metrics are provided, because no predictive engrams survived the LASSO regularization.**")
   }
 
-  invisible(summary_dataframe)
+  invisible(summary_list)
 }
