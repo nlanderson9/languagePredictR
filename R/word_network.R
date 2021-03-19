@@ -190,7 +190,10 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
     }
   }
   else {
-    if (is.null(plotTitle) | !plotTitle) {
+    if (is.null(plotTitle)) {
+      plot_title = ""
+    }
+    else if (!is.character(plotTitle)) {
       plot_title = ""
     }
     else {
