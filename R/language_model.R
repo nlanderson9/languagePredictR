@@ -403,6 +403,8 @@ summary.langModel = function(object, ...){
   summary_list[["language.samples"]] = nrow(object@x)
   cat(paste("Outcome variable:", object@outcome,"\n"))
   summary_list[["outcome"]] = object@outcome
+  summary_list[["outcome.level.low"]] = object@level0
+  summary_list[["outcome.level.high"]] = object@level1
   cat(paste("Ngrams used:", object@ngrams,"\n"))
   summary_list[["ngram"]] = object@ngrams
   cat(paste("Total number of ngrams in dataset:", total_tokens,"\n"))
@@ -413,9 +415,9 @@ summary.langModel = function(object, ...){
   cat(paste("Number of predictive ngrams in final model:", nrow(object@cat0raw)+nrow(object@cat1raw),"\n"))
   summary_list[["total.predictive.ngrams"]] = nrow(object@cat0raw)+nrow(object@cat1raw)
   cat(paste0("    Number of ngrams predicting '",object@level0,"': ",nrow(object@cat0raw),"\n"))
-  summary_list[[paste0("predictive.ngrams.",object@level0)]] = nrow(object@cat0raw)
+  summary_list[["predictive.ngrams.level.low"]] = nrow(object@cat0raw)
   cat(paste0("    Number of ngrams predicting '",object@level1,"': ",nrow(object@cat1raw),"\n\n"))
-  summary_list[[paste0("predictive.ngrams.",object@level1)]] = nrow(object@cat1raw)
+  summary_list[["predictive.ngrams.level.high"]] = nrow(object@cat1raw)
   cat(paste0("Cross-validated ",lossName," at '",object@lambda,"' = ",print_cvm,"\n\n"))
   if (!is.na(object@p_value)) {
     cat(paste0("Estimated p-value = ",signif(object@p_value,3)," (st.err. = ", signif(object@st_err_p,3),")\n"))

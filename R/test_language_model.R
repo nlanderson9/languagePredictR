@@ -260,6 +260,8 @@ summary.testAssessment = function(object, ...){
   summary_list[["language.samples"]] = nrow(object@x)
   cat(paste("Outcome variable:", object@outcome,"\n"))
   summary_list[["outcome"]] = object@outcome
+  summary_list[["outcome.level.low"]] = object@level0
+  summary_list[["outcome.level.high"]] = object@level1
   cat(paste("Ngrams used:", object@ngrams,"\n"))
   summary_list[["ngram"]] = object@ngrams
   cat(paste("Total number of ngrams in dataset:", total_tokens,"\n"))
