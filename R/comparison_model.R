@@ -186,7 +186,7 @@ summary.compModel = function(object, ...){
   cat(paste0(call_string,"\n\n"))
   summary_list[["call"]] = call_string
   cat(paste("Number of samples provided (n):", length(object@data_predictor),"\n"))
-  summary_list[["samples"]] = nrow(object@x)
+  summary_list[["samples"]] = nrow(object@data_predictor)
   cat(paste0("Predictor variable: '", object@predictor,"'\n"))
   summary_list[["predictor"]] = object@predictor
   cat(paste0("Outcome variable: '", object@outcome,"'\n\n"))
