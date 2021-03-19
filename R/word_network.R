@@ -165,18 +165,20 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
       title1 = paste(model@level1, "text")
       title2 = paste(model@level0, "&", model@level1, "text")
     }
-    else if (!plotTitle) {
-      title0 = ""
-      title1 = ""
-      title2 = ""
-    }
     else {
-      if (length(plotTitle) != 3) {
-        stop("The `plotTitle` argument must include titles for all 3 plots resulting from your model (both outcomes + combined).")
+      if (is.character(plotTitle)) {
+        if (length(plotTitle) != 3) {
+          stop("The `plotTitle` argument must include titles for all 3 plots resulting from your model (both outcomes + combined).")
+        }
+        title0 = plotTitle[1]
+        title1 = plotTitle[2]
+        title2 = plotTitle[3]
       }
-      title0 = plotTitle[1]
-      title1 = plotTitle[2]
-      title2 = plotTitle[3]
+      else {
+        title0 = ""
+        title1 = ""
+        title2 = ""
+      }
     }
 
     if(graphIndividual){
