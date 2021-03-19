@@ -425,6 +425,12 @@ summary.langModel = function(object, ...){
     summary_list[["permutations.k"]] = object@permutationK
     summary_list[["minimum.possible.p.value"]] = object@minimum_p
   }
+  else {
+    summary_list[["estimated.p.value"]] = NA
+    summary_list[["standard.error.p.value"]] = NA
+    summary_list[["permutations.k"]] = NA
+    summary_list[["minimum.possible.p.value"]] = NA
+  }
   cat("Various model evaluation metrics:\n")
   cat("   (Caution: these were obtained by using the cross-validated model to predict outcomes based on the original dataset)\n\n")
   if (object@type == "binary" & nrow(object@cat0raw)+nrow(object@cat1raw) > 0) {
