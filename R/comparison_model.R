@@ -32,7 +32,7 @@ compModel = setClass("compModel", slots = c("call", "data_predictor", "data_outc
 
 #' Create Comparison Model
 #'
-#' #' @description This function creates a regression model using a single numeric variable as a predictor, and a specified variable as the outcome. It is intended for comparison against models that use language as a predictor (created by \code{\link{language_model}}).
+#' @description This function creates a regression model using a single numeric variable as a predictor, and a specified variable as the outcome. It is intended for comparison against models that use language as a predictor (created by \code{\link{language_model}}).
 #'
 #' @param input A dataframe containing a column with predictor data (numeric variable) and an outcome variable (numeric or two-level factor)
 #' @param outcome A string consisting of the column name for the outcome variable in \code{inputDataframe}

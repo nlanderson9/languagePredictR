@@ -21,7 +21,7 @@ comparison_model(input, outcome, outcomeType, predictor, progressBar = TRUE)
 An object of the type "compModel"
 }
 \description{
-#' @description This function creates a regression model using a single numeric variable as a predictor, and a specified variable as the outcome. It is intended for comparison against models that use language as a predictor (created by \code{\link{language_model}}).
+This function creates a regression model using a single numeric variable as a predictor, and a specified variable as the outcome. It is intended for comparison against models that use language as a predictor (created by \code{\link{language_model}}).
 }
 \examples{
 \dontrun{
