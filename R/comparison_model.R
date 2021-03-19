@@ -175,15 +175,22 @@ summary.compModel = function(object, ...){
 
   original=predicted_prob=predicted_class=predicted=NULL
 
+  summary_list = list()
+  summary_list[["model.name"]] = deparse(substitute(object))
+
   call_string = deparse(object@call)
   call_string = paste(call_string, collapse = " ")
   call_string = gsub("\\s+", " ", call_string)
   call_string = paste("Call::", call_string)
 
   cat(paste0(call_string,"\n\n"))
+  summary_list[["call"]] = call_string
   cat(paste("Number of samples provided (n):", length(object@data_predictor),"\n"))
+  summary_list[["samples"]] = nrow(object@x)
   cat(paste0("Predictor variable: '", object@predictor,"'\n"))
+  summary_list[["predictor"]] = object@predictor
   cat(paste0("Outcome variable: '", object@outcome,"'\n\n"))
+  summary_list[["outcome"]] = object@outcome
   cat("Various model evaluation metrics:\n")
   cat("   (Caution: these were obtained by using the model to predict outcomes based on the original dataset)\n\n")
   if (object@type == "binary") {
@@ -208,9 +215,13 @@ summary.compModel = function(object, ...){
     print_auc = signif(roc_auc, 3)
 
     cat(paste("Predictive accuracy:",print_pred_acc,"\n"))
+    summary_list[["predictive.accuracy"]] = predictive_accuracy
     cat(paste("Kappa:",print_kappa,"\n"))
+    summary_list[["kappa"]] = kappa
     cat(paste("Log loss:",print_log_loss,"\n"))
+    summary_list[["log.loss"]] = log_loss
     cat(paste("ROC AUC:",print_auc,"\n"))
+    summary_list[["auc"]] = roc_auc
   }
   else if (object@type == "continuous") {
     metric_dataframe = data.frame(original=object@y, predicted=object@predicted_y)
@@ -225,10 +236,11 @@ summary.compModel = function(object, ...){
     print_mae = ifelse(mae > 1, round(mae,3), signif(mae,3))
 
     cat(paste("Root mean squared error:",print_rmse,"\n"))
+    summary_list[["root.mean.squared.error"]] = rmse
     cat(paste("R-squared:",print_rsq,"\n"))
+    summary_list[["r.squared"]] = rsq
     cat(paste("Mean absolute error:",print_mae,"\n"))
+    summary_list[["mean.absolute.error"]] = mae
   }
-  # else if (nrow(model@cat0raw)+nrow(model@cat1raw) == 0) {
-  #   cat("**No model evaluation metrics are provided, because no predictive engrams survived the LASSO regularization.**")
-  # }
+  invisible(summary_list)
 }

@@ -229,6 +229,10 @@ summary.testAssessment = function(object, ...){
 
   original=predicted_prob=predicted_class=predicted=NULL
 
+  summary_list = list()
+  summary_list[["model.name"]] = deparse(substitute(object))
+  summary_list[["trained.model.name"]] = object@trainedModel
+
   corpus_object = quanteda::corpus(object@data_text)
 
   tokens_object = corpus_object %>% quanteda::tokens()
@@ -251,12 +255,21 @@ summary.testAssessment = function(object, ...){
   call_string = paste("Call:", call_string)
 
   cat(paste0(call_string,"\n\n"))
+  summary_list[["call"]] = call_string
   cat(paste("Number of language samples provided (n):", nrow(object@x),"\n"))
+  summary_list[["language.samples"]] = nrow(object@x)
+  cat(paste("Outcome variable:", object@outcome,"\n"))
+  summary_list[["outcome"]] = object@outcome
   cat(paste("Ngrams used:", object@ngrams,"\n"))
+  summary_list[["ngram"]] = object@ngrams
   cat(paste("Total number of ngrams in dataset:", total_tokens,"\n"))
+  summary_list[["total.ngrams"]] = total_tokens
   cat(paste("Number of unique ngrams in dataset:", ncol(object@x),"\n"))
+  summary_list[["unique.ngrams"]] = ncol(object@x)
   cat(paste("Number of predictive ngrams included in the original model:", length(object@original_predictive_ngrams),"\n"))
+  summary_list[["original.predictive.ngams"]] = length(object@original_predictive_ngrams)
   cat(paste("Number of predictive ngrams appearing in dataset:",object@ngrams_present,"/",length(object@original_predictive_ngrams),"\n\n"))
+  summary_list[["original.predictive.ngams.present"]] = object@ngrams_present
 
   cat("Various model evaluation metrics:\n")
   cat("   (These were obtained by using the original cross-validated model to predict outcomes based on the current dataset)\n\n")
@@ -282,9 +295,13 @@ summary.testAssessment = function(object, ...){
     print_auc = signif(roc_auc, 3)
 
     cat(paste("Predictive accuracy:",print_pred_acc,"\n"))
+    summary_list[["predictive.accuracy"]] = predictive_accuracy
     cat(paste("Kappa:",print_kappa,"\n"))
+    summary_list[["kappa"]] = kappa
     cat(paste("Log loss:",print_log_loss,"\n"))
+    summary_list[["log.loss"]] = log_loss
     cat(paste("ROC AUC:",print_auc,"\n"))
+    summary_list[["auc"]] = roc_auc
   }
   else if (object@type == "continuous") {
     metric_dataframe = data.frame(original=object@y, predicted=object@predicted_y)
@@ -299,7 +316,11 @@ summary.testAssessment = function(object, ...){
     print_mae = ifelse(mae > 1, round(mae,3), signif(mae,3))
 
     cat(paste("Root mean squared error:",print_rmse,"\n"))
+    summary_list[["root.mean.squared.error"]] = rmse
     cat(paste("R-squared:",print_rsq,"\n"))
+    summary_list[["r.squared"]] = rsq
     cat(paste("Mean absolute error:",print_mae,"\n"))
+    summary_list[["mean.absolute.error"]] = mae
   }
+  invisible(summary_list)
 }
