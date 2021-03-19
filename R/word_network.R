@@ -189,6 +189,27 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
       make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
     }
   }
+  else if (!is.null(model)) {
+    if (is.null(plotTitle)) {
+      plot_title = ""
+    }
+    else if (!is.character(plotTitle)) {
+      plot_title = ""
+    }
+    else {
+      if(length(plotTitle) != 1) {
+        stop("The `plotTitle` argument can only be a length of 1.")
+      }
+      plot_title = plotTitle
+    }
+    if (model@type == "continuous") {
+      make_word_network(input, model=model, topX=topX, cat=2, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    }
+    else {
+      warning("You did not provide a model for the creation of the input data - the `model` argument will be ignored.")
+      make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    }
+  }
   else {
     if (is.null(plotTitle)) {
       plot_title = ""

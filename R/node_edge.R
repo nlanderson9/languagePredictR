@@ -112,23 +112,28 @@ node_edge = function(input, maxDist=4, removeStopwords=FALSE, showProgress = TRU
   dist=indiv_count=inverse_mean_dist=cooc_count=first_count=second_count=total_dist=NULL
 
   if (class(input) == "langModel") {
-    text = input@data_text
-    outcome = input@data_outcome
-    text_dataframe = data.frame(text=text, outcome=outcome)
-    level0_text = subset(text_dataframe, outcome==input@level0)
-    level1_text = subset(text_dataframe, outcome==input@level1)
-    level0_result = make_node_edge_table(level0_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level0, showProgress = showProgress)
-    level1_result = make_node_edge_table(level1_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level1, showProgress = showProgress)
-    level0_result$outcome = input@level0
-    level1_result$outcome = input@level1
-    combined_result = bind_rows(level0_result, level1_result)
-    overall_result = combined_result %>%
-      group_by(first, second) %>%
-      summarise(total_dist = sum(total_dist), cooc_count = sum(cooc_count), first_count = sum(first_count), second_count = sum(second_count), .groups = "drop_last") %>%
-      mutate(inverse_mean_dist = 1 / (total_dist / cooc_count)) %>%
-      mutate(weight = inverse_mean_dist * ( (2*cooc_count) / (first_count + second_count) ))
-    overall_result$outcome = "all_outcomes"
-    result = bind_rows(combined_result, overall_result)
+    if (input@type == "binary") {
+      text = input@data_text
+      outcome = input@data_outcome
+      text_dataframe = data.frame(text=text, outcome=outcome)
+      level0_text = subset(text_dataframe, outcome==input@level0)
+      level1_text = subset(text_dataframe, outcome==input@level1)
+      level0_result = make_node_edge_table(level0_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level0, showProgress = showProgress)
+      level1_result = make_node_edge_table(level1_text, maxDist = maxDist, removeStopwords = removeStopwords, level=input@level1, showProgress = showProgress)
+      level0_result$outcome = input@level0
+      level1_result$outcome = input@level1
+      combined_result = bind_rows(level0_result, level1_result)
+      overall_result = combined_result %>%
+        group_by(first, second) %>%
+        summarise(total_dist = sum(total_dist), cooc_count = sum(cooc_count), first_count = sum(first_count), second_count = sum(second_count), .groups = "drop_last") %>%
+        mutate(inverse_mean_dist = 1 / (total_dist / cooc_count)) %>%
+        mutate(weight = inverse_mean_dist * ( (2*cooc_count) / (first_count + second_count) ))
+      overall_result$outcome = "all_outcomes"
+      result = bind_rows(combined_result, overall_result)
+    }
+    else if (input@type == "continuous") {
+      result = make_node_edge_table(input@data_text, maxDist = maxDist, removeStopwords = removeStopwords, level=NULL, showProgress = showProgress)
+    }
   }
   else if (is.character(input)) {
     result = make_node_edge_table(input, maxDist = maxDist, removeStopwords = removeStopwords, level=NULL, showProgress = showProgress)
