@@ -45,7 +45,7 @@ compModel = setClass("compModel", slots = c("call", "data_predictor", "data_outc
 #'
 #' @import quanteda
 #' @import dplyr
-#' @importFrom pROC roc
+#' @import pROC
 #' @importFrom stats cor.test
 #' @importFrom methods setClass new
 #' @importFrom rlang .data
