@@ -35,14 +35,14 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
   # Keep only the topX items
   resultGraph =   input_sorted[1:topX,]
   if(cluster) {
-    clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))))
+    clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))), plot=FALSE, verbose=FALSE)
     clustering_table = clustering_data$edges
     clustering_table = clustering_table %>% rowwise() %>% mutate(color1 = hue_pal()(as.numeric(cluster))[as.numeric(cluster)])
 
     resultGraph = resultGraph %>% left_join(clustering_table, by=c("first" = "node1", "second" = "node2"))
     resultGraph$alpha = ifelse(is.na(resultGraph$color1), .5, 1)
     resultGraph$color = ifelse(is.na(resultGraph$color1), "#000000", resultGraph$color1)
-    resultGraph = resultGraph %>% rowwise %>% mutate(adjust_color = adjustcolor(color1, alpha.f = alpha))
+    resultGraph = resultGraph %>% rowwise %>% mutate(adjusted_color = adjustcolor(color1, alpha.f = alpha))
   }
 
   # Create the graph object
