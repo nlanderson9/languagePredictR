@@ -46,5 +46,6 @@ Imports:
     igraph,
     doParallel,
     Matrix,
-    yardstick
+    yardstick,
+    linkcomm
 RoxygenNote: 7.1.1

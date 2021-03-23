@@ -12,6 +12,7 @@ word_network(
   graphCombined = FALSE,
   directed = FALSE,
   removeVerticesBelowDegree = 2,
+  cluster = FALSE,
   edgeColor = "darkgray",
   edgeAlpha = 0.5,
   edgeCurve = 0.15,
@@ -36,6 +37,8 @@ word_network(
 \item{directed}{Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).}
 
 \item{removeVerticesBelowDegree}{An integer which determines the minimum number of edges a node must have to be included. Default is 2.}
+
+\item{cluster}{If TRUE, a clustering algorithm is applied to the network, and edges are recolored according to their cluster membership. Default is FALSE.}
 
 \item{edgeColor}{The color of the edges. Default is "darkgray".}
 

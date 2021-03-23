@@ -5,6 +5,7 @@
 #' @param topX The top X words to include
 #' @param directed Whether the network is directed
 #' @param removeVerticesBelowDegree Number of minimum edges a node must have to include
+#' @param cluster Whether clustering should be performed
 #' @param edgeColor Edge color
 #' @param edgeAlpha Edge alpha
 #' @param edgeCurve Degree of edge curve
@@ -18,11 +19,12 @@
 #' @noRd
 #'
 #' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr
+#' @importFrom linkcomm getLinkCommunities
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
 #' @importFrom graphics par
 
-make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", cat=NULL) {
+make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, cluster=FALSE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", cat=NULL) {
 
   cooc_count = outcome = NULL
 
@@ -32,12 +34,27 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 
   # Keep only the topX items
   resultGraph =   input_sorted[1:topX,]
+  if(cluster) {
+    clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))))
+    clustering_table = clustering_data$edges
+    clustering_table = clustering_table %>% rowwise() %>% mutate(color1 = hue_pal()(as.numeric(cluster))[as.numeric(cluster)])
+
+    resultGraph = resultGraph %>% left_join(clustering_table, by=c("first" = "node1", "second" = "node2"))
+    resultGraph$alpha = ifelse(is.na(resultGraph$color1), .5, 1)
+    resultGraph$color = ifelse(is.na(resultGraph$color1), "#000000", resultGraph$color1)
+    resultGraph = resultGraph %>% rowwise %>% mutate(adjust_color = adjustcolor(color1, alpha.f = alpha))
+  }
 
   # Create the graph object
   graphNetwork = graph.data.frame(resultGraph, directed = directed)
 
   # Set edge colors
-  E(graphNetwork)$color = adjustcolor(edgeColor, alpha.f = edgeAlpha)
+  if(cluster) {
+    E(graphNetwork)$color = E(graphNetwork)$adjusted_color
+  }
+  else {
+    E(graphNetwork)$color = adjustcolor(edgeColor, alpha.f = edgeAlpha)
+  }
 
   # Rescale the weights to plot edges nicely
   E(graphNetwork)$width = scales::rescale(E(graphNetwork)$weight, to = c(1, 10))
@@ -123,6 +140,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' @param graphCombined If TRUE, a network is graphed based on the entire language corpus. Default is FALSE.
 #' @param directed Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).
 #' @param removeVerticesBelowDegree An integer which determines the minimum number of edges a node must have to be included. Default is 2.
+#' @param cluster If TRUE, a clustering algorithm is applied to the network, and edges are recolored according to their cluster membership. Default is FALSE.
 #' @param edgeColor The color of the edges. Default is "darkgray".
 #' @param edgeAlpha The alpha of the edges. Default is 0.5.
 #' @param edgeCurve If greater than 0, edges will be curved with a radius corresponding to the value. Default is 0.15. A value of 0 yields straight edges.
@@ -152,7 +170,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' word_network(node_edge_table)
 #' }
 
-word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graphCombined=FALSE, directed=FALSE, removeVerticesBelowDegree = 2, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
+word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graphCombined=FALSE, directed=FALSE, removeVerticesBelowDegree = 2, cluster=FALSE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
 
   outcome=NULL
 
@@ -182,11 +200,11 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
     }
 
     if(graphIndividual){
-      make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-      make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
     }
     if(graphCombined){
-      make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
     }
   }
   else if (!is.null(model)) {
@@ -203,11 +221,11 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
       plot_title = plotTitle
     }
     if (model@type == "continuous") {
-      make_word_network(input, model=model, topX=topX, cat=2, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(input, model=model, topX=topX, cat=2, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
     }
     else {
       warning("You did not provide a model for the creation of the input data - the `model` argument will be ignored.")
-      make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
     }
   }
   else {
@@ -223,6 +241,6 @@ word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graph
       }
       plot_title = plotTitle
     }
-    make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, cluster=cluster, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
   }
 }
