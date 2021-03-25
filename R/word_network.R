@@ -24,7 +24,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr cluster_edge_betweenness cluster_fast_greedy cluster_infomap cluster_label_prop cluster_leading_eigen cluster_louvain cluster_optimal cluster_spinglass cluster_walktrap
+#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr communities cluster_edge_betweenness cluster_fast_greedy cluster_infomap cluster_label_prop cluster_leading_eigen cluster_louvain cluster_optimal cluster_spinglass cluster_walktrap
 #' @importFrom linkcomm getLinkCommunities
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
@@ -548,7 +548,7 @@ plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, 
 #'
 #' @param network_input The output of the \code{plot_word_network} function
 #'
-#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr nicely
+#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr nicely communities
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
 #' @importFrom graphics par
