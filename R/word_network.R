@@ -400,13 +400,13 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     }
   }
   if (clusterType == "none") {
-    return(list(network_object = graphNetwork, layout_object = layout))
+    return(list(network_object = graphNetwork, layout_object = layout, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
   else if (clusterType == "node") {
-    return(list(network_object = graphNetwork, layout_object = layout, cluster_object=result))
+    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = result, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
   else if (clusterType == "edge") {
-    return(list(network_object = graphNetwork, layout_object = layout, cluster_object=clustering_table))
+    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = clustering_table, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
 }
 
@@ -582,6 +582,11 @@ plot_cluster = function(network_input, cluster_number) {
     clusterType = "edge"
     clustering_data = network_input$cluster_object
   }
+  parameters = network_input$parameters
+  edgeColor = parameters$edgeColor
+  edgeAlpha = parameters$edgeAlpha
+  nodeLabelColor = parameters$nodeLabelColor
+  nodeLabelSize = parameters$nodeLabelSize
 
   i = cluster_number
 
