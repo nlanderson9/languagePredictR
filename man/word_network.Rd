@@ -12,7 +12,13 @@ word_network(
   graphCombined = FALSE,
   directed = FALSE,
   removeVerticesBelowDegree = 2,
-  cluster = FALSE,
+  clusterType = "none",
+  clusterNodeMethod = "infomap",
+  plotUnclusteredNetwork = TRUE,
+  plotClusteredNetwork = TRUE,
+  plotIndividualClusters = TRUE,
+  plotIndividualClusterFacet = TRUE,
+  plotClusterLegend = TRUE,
   edgeColor = "darkgray",
   edgeAlpha = 0.5,
   edgeCurve = 0.15,
@@ -38,7 +44,19 @@ word_network(
 
 \item{removeVerticesBelowDegree}{An integer which determines the minimum number of edges a node must have to be included. Default is 2.}
 
-\item{cluster}{If TRUE, a clustering algorithm is applied to the network, and edges are recolored according to their cluster membership. Default is FALSE.}
+\item{clusterType}{The type of clustering to perform. "node" clusters by nodes (using the method defined by \code{clusterNodeMethod}), "edge" clusters by edges (using the \code{lincomm} package. Defaults to "none".}
+
+\item{clusterNodeMethod}{If clustering by "node", this determines the method used. Options are the same clustering options given in the \code{igraph} package.}
+
+\item{plotUnclusteredNetwork}{If TRUE, the network is plotted with no clustering displayed. Defaults to TRUE.}
+
+\item{plotClusteredNetwork}{If TRUE, the network is plotted with clustering displayed (shaded regions for "node" clustering, colored edges for "edge" clustering). Defaults to TRUE.}
+
+\item{plotIndividualClusters}{If TRUE, each cluster is plotted in a separate graph. Defaults to TRUE.}
+
+\item{plotIndividualClusterFacet}{If TRUE, each cluster is plotted in a faceted section of a single graph. Defaults to TRUE.}
+
+\item{plotClusterLegend}{If TRUE, plots a legend with cluster numbers and corresponding colors. Defaults to TRUE.}
 
 \item{edgeColor}{The color of the edges. Default is "darkgray".}
 
