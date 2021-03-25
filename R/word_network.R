@@ -575,11 +575,11 @@ plot_cluster = function(network_input, cluster_number) {
   graphNetwork = network_input$network_object
   layout = network_input$layout_object
   if (!is.null(network_input$cluster_object$membership)) {
-    clusterType == "node"
+    clusterType = "node"
     result = network_input$cluster_object
   }
   else {
-    clusterType == "edge"
+    clusterType = "edge"
     clustering_data = network_input$cluster_object
   }
 
