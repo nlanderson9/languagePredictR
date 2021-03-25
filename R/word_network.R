@@ -582,7 +582,7 @@ plot_cluster = function(network_input, cluster_number) {
   else {
     clusterType = "edge"
     clustering_data = network_input$cluster_object
-    num_clusters = max(as.numeric(clustering_data$nodeclusters$cluster))
+    num_clusters = max(as.numeric(clustering_data$cluster))
   }
   parameters = network_input$parameters
   edgeColor = parameters$edgeColor
@@ -605,7 +605,7 @@ plot_cluster = function(network_input, cluster_number) {
 
     if (length(V(graphNetwork_cluster)) > 1) {
       layout_frame = data.frame(rownumber=seq(1,length(V(graphNetwork)$name)), name=V(graphNetwork)$name)
-      nodes_to_keep = subset(clustering_data$nodeclusters, cluster==i)
+      nodes_to_keep = subset(clustering_data, cluster==i)
       layout_frame = subset(layout_frame, name %in% nodes_to_keep$node)
       layout_cluster = layout[layout_frame$rownumber,]
     }
