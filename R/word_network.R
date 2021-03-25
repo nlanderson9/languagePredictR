@@ -577,10 +577,12 @@ plot_cluster = function(network_input, cluster_number) {
   if (!is.null(network_input$cluster_object$membership)) {
     clusterType = "node"
     result = network_input$cluster_object
+    num_clusters = max(result$membership)
   }
   else {
     clusterType = "edge"
     clustering_data = network_input$cluster_object
+    num_clusters = max(as.numeric(clustering_data$nodeclusters$cluster))
   }
   parameters = network_input$parameters
   edgeColor = parameters$edgeColor
