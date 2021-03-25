@@ -20,6 +20,7 @@
 #' @param nodeLabelSize Label size
 #' @param nodeLabelColor Label color
 #' @param plotTitle Plot title
+#' @param layout igraph layout to reuse
 #' @param cat Level (0, 1, or 2 (both))
 #'
 #' @noRd
@@ -30,7 +31,7 @@
 #' @importFrom grDevices adjustcolor
 #' @importFrom graphics par
 
-make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, clusterType="none", clusterNodeMethod="infomap", plotUnclusteredNetwork=TRUE, plotClusteredNetwork=TRUE, plotIndividualClusters=TRUE, plotIndividualClusterFacet=TRUE, plotClusterLegend=TRUE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", cat=NULL) {
+make_word_network = function(input_node_edge_table, model=NULL, topX=100, directed=FALSE, removeVerticesBelowDegree = 2, clusterType="none", clusterNodeMethod="infomap", plotUnclusteredNetwork=TRUE, plotClusteredNetwork=TRUE, plotIndividualClusters=TRUE, plotIndividualClusterFacet=TRUE, plotClusterLegend=TRUE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black",  plotTitle="", layout=NULL, cat=NULL) {
 
   cooc_count = outcome = NULL
 
@@ -179,7 +180,9 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     par(mai=c(0,0,.5,0))
   }
 
-  layout = layout_(graphNetwork, with_fr())
+  if(is.null(layout)) {
+    layout = layout_(graphNetwork, with_fr())
+  }
 
   # layout(matrix(c(1,1), ncol=1, byrow = TRUE))
   par(mfrow=c(1,1))
@@ -435,6 +438,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' @param nodeLabelSize The size of the text for node labels. Defaults to 1.
 #' @param nodeLabelColor The color of the node labels. Defaults to "black".
 #' @param plotTitle The title of the plot(s). If a model is used, it must be a vector of three strings. If not, it must be a single string.
+#' @param layout An \code{igraph} layout object, helpful if you want to re-graph the same network multiple times with the same layout
 #'
 #' @return A list containing the \code{igraph} network object, \code{igraph} layout, and clustering data (if applicable) - this can be used with the \code{plot_cluster} function, or graphed manually with the \code{igraph} package
 #'
@@ -456,7 +460,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #' plot_word_network(node_edge_table)
 #' }
 
-plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graphCombined=FALSE, directed=FALSE, removeVerticesBelowDegree = 2, clusterType="none", clusterNodeMethod="infomap", plotUnclusteredNetwork=TRUE, plotClusteredNetwork=TRUE, plotIndividualClusters=TRUE, plotIndividualClusterFacet=TRUE, plotClusterLegend=TRUE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL) {
+plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, graphCombined=FALSE, directed=FALSE, removeVerticesBelowDegree = 2, clusterType="none", clusterNodeMethod="infomap", plotUnclusteredNetwork=TRUE, plotClusteredNetwork=TRUE, plotIndividualClusters=TRUE, plotIndividualClusterFacet=TRUE, plotClusterLegend=TRUE, edgeColor="darkgray", edgeAlpha = .5, edgeCurve = .15, modelNodeColors = c("lightblue", "orange"), modelNodeSizeRange = c(5,10), nodeLabelSize=1, nodeLabelColor="black", plotTitle=NULL, layout=NULL) {
 
   outcome=NULL
 
@@ -486,11 +490,11 @@ plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, 
     }
 
     if(graphIndividual){
-      output1 = make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
-      output2 = make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      output1 = make_word_network(subset(input, outcome==model@level0), model=model, topX=topX, cat=0, plotTitle=title0, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
+      output2 = make_word_network(subset(input, outcome==model@level1), model=model, topX=topX, cat=1, plotTitle=title1, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
     }
     if(graphCombined){
-      output3 = make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      output3 = make_word_network(subset(input, outcome=="all_outcomes"), model=model, topX=topX, cat=2, plotTitle=title2, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
     }
     if(graphIndividual & graphCombined) {
       invisible(list(output1, output2, output3))
@@ -516,12 +520,12 @@ plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, 
       plot_title = plotTitle
     }
     if (model@type == "continuous") {
-      output = make_word_network(input, model=model, topX=topX, cat=2, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      output = make_word_network(input, model=model, topX=topX, cat=2, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
       invisible(output)
     }
     else {
       warning("You did not provide a model for the creation of the input data - the `model` argument will be ignored.")
-      output = make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+      output = make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
       invisible(output)
     }
   }
@@ -538,7 +542,7 @@ plot_word_network = function(input, model=NULL, topX=100, graphIndividual=TRUE, 
       }
       plot_title = plotTitle
     }
-    output = make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor)
+    output = make_word_network(input, model=NULL, topX=topX, cat=NULL, plotTitle=plot_title, directed=directed, removeVerticesBelowDegree=removeVerticesBelowDegree, clusterType=clusterType, clusterNodeMethod=clusterNodeMethod, plotUnclusteredNetwork=plotUnclusteredNetwork, plotClusteredNetwork=plotClusteredNetwork, plotIndividualClusters=plotIndividualClusters, plotIndividualClusterFacet=plotIndividualClusterFacet, plotClusterLegend=plotClusterLegend, edgeColor=edgeColor, edgeAlpha=edgeAlpha, edgeCurve=edgeCurve, modelNodeColors=modelNodeColors, modelNodeSizeRange=modelNodeSizeRange, nodeLabelSize=nodeLabelSize, nodeLabelColor=nodeLabelColor, layout=layout)
     invisible(output)
   }
 }
