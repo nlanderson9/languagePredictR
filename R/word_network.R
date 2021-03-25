@@ -593,10 +593,10 @@ plot_cluster = function(network_input, cluster_number) {
   i = cluster_number
 
   if (clusterType == "edge") {
-    if (!plotClusteredNetwork) {
-      E(graphNetwork)$color = E(graphNetwork)$color1
-      E(graphNetwork)$lty = E(graphNetwork)$linetype
-    }
+
+    E(graphNetwork)$color = E(graphNetwork)$color1
+    E(graphNetwork)$lty = E(graphNetwork)$linetype
+
 
     remove_other_edges = E(graphNetwork)[E(graphNetwork)$cluster != as.character(i)]
     graphNetwork_cluster = delete.edges(graphNetwork, remove_other_edges)
