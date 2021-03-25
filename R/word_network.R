@@ -625,7 +625,7 @@ plot_cluster = function(network_input, cluster_number) {
       vertex.label = V(graphNetwork_cluster)$name,
       vertex.label.cex = nodeLabelSize # font size of node names
     )
-    title(paste("Cluster", i),cex.main=3,col.main=hue_pal()(num_clusters)[i])
+    title(paste("Cluster", i),cex.main=1,col.main=hue_pal()(num_clusters)[i])
 
   }
   else if (clusterType == "node") {
@@ -657,6 +657,6 @@ plot_cluster = function(network_input, cluster_number) {
       mark.col =  rainbow(num_clusters, alpha = 0.3)[i],
       mark.border = rainbow(num_clusters, alpha = 1)[i]
     )
-    title(paste("Cluster", i),cex.main=3,col.main=rainbow(num_clusters, alpha=1)[i])
+    title(paste("Cluster", i),cex.main=1,col.main=rainbow(num_clusters, alpha=1)[i])
   }
 }
