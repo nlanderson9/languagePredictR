@@ -45,6 +45,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
   if (clusterType=="none") {
     plotClusteredNetwork = FALSE
     plotIndividualClusters = FALSE
+    plotIndividualClusterFacet = FALSE
   }
 
   # Sort input text by number of pair occurrences
