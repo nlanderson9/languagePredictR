@@ -24,7 +24,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr
+#' @importFrom igraph graph.data.frame E<- V<- E V degree delete.vertices plot.igraph layout_ with_fr cluster_edge_betweenness cluster_fast_greedy cluster_infomap cluster_label_prop cluster_leading_eigen cluster_louvain cluster_optimal cluster_spinglass cluster_walktrap
 #' @importFrom linkcomm getLinkCommunities
 #' @importFrom rlang .data
 #' @importFrom grDevices adjustcolor
