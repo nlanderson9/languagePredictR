@@ -406,7 +406,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     return(list(network_object = graphNetwork, layout_object = layout, cluster_object = result, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
   else if (clusterType == "edge") {
-    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = clustering_table, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
+    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = clustering_data, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
 }
 
@@ -582,7 +582,7 @@ plot_cluster = function(network_input, cluster_number) {
   else {
     clusterType = "edge"
     clustering_data = network_input$cluster_object
-    num_clusters = max(as.numeric(clustering_data$cluster))
+    num_clusters = max(as.numeric(clustering_data$edges$cluster))
   }
   parameters = network_input$parameters
   edgeColor = parameters$edgeColor
@@ -605,7 +605,7 @@ plot_cluster = function(network_input, cluster_number) {
 
     if (length(V(graphNetwork_cluster)) > 1) {
       layout_frame = data.frame(rownumber=seq(1,length(V(graphNetwork)$name)), name=V(graphNetwork)$name)
-      nodes_to_keep = subset(clustering_data, cluster==i)
+      nodes_to_keep = subset(clustering_data$nodeclusters, cluster==i)
       layout_frame = subset(layout_frame, name %in% nodes_to_keep$node)
       layout_cluster = layout[layout_frame$rownumber,]
     }
