@@ -57,12 +57,6 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
   resultGraph = input_sorted[1:topX,]
 
   if(clusterType=="edge") {
-
-    all_inputs = c(resultGraph$first, resultGraph$second)
-    all_inputs_table = table(all_inputs)
-    inputs_1 = all_inputs_table[all_inputs_table < removeVerticesBelowDegree]
-    resultGraph = subset(resultGraph, !(first %in% names(inputs_1)) & !(second %in% names(inputs_1)))
-
     clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))), plot=FALSE, verbose=FALSE)
     clustering_table = clustering_data$edges
     num_clusters = max(as.numeric(clustering_table$cluster))
@@ -135,10 +129,46 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     }
   }
 
-  if (clusterType != "edge") {
-    # Remove nodes that have few connections
-    verticesToRemove = V(graphNetwork)[degree(graphNetwork) < removeVerticesBelowDegree]
-    graphNetwork = delete.vertices(graphNetwork, verticesToRemove)
+  # Remove nodes that have few connections
+  verticesToRemove = V(graphNetwork)[degree(graphNetwork) < removeVerticesBelowDegree]
+  graphNetwork = delete.vertices(graphNetwork, verticesToRemove)
+
+  if (clusterType == "edge") {
+    current_clusters = unique(E(graphNetwork)$cluster)
+    if (length(current_clusters) != length(cluster_levels)) {
+      if ("No cluster" %in% current_clusters) {
+        current_clusters = current_clusters[current_clusters != "No cluster"]
+        still_no_cluster = TRUE
+      }
+      else {
+        still_no_cluster = FALSE
+      }
+
+      j = 1
+      for (i in 1:num_clusters) {
+        if (as.character(i) %in% current_clusters) {
+          E(graphNetwork)$cluster = ifelse(E(graphNetwork)$cluster == as.character(i), as.character(j), E(graphNetwork)$cluster)
+          E(graphNetwork)$color1 = ifelse(E(graphNetwork)$cluster == as.character(i), hue_pal()(length(current_clusters))[i], E(graphNetwork)$color1)
+          j = j + 1
+        }
+      }
+
+      if (still_no_cluster) {
+        num_clusters = length(current_clusters) - 1
+      }
+      else {
+        num_clusters = length(current_clusters)
+      }
+
+      cluster_levels = seq(from=1, to=num_clusters, by=1)
+      cluster_colors = hue_pal()(num_clusters)
+      cluster_lty = rep(1, num_clusters)
+      if(still_no_cluster) {
+        cluster_levels = c(as.character(cluster_levels), "No cluster")
+        cluster_colors = c(cluster_colors, "#000000")
+        cluster_lty = c(cluster_lty, 2)
+      }
+    }
   }
 
   if (clusterType == "node"){
