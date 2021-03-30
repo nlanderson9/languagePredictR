@@ -292,8 +292,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 
         if (length(V(graphNetwork_cluster)) > 1) {
           layout_frame = data.frame(rownumber=seq(1,length(V(graphNetwork)$name)), name=V(graphNetwork)$name)
-          nodes_to_keep = subset(clustering_data$nodeclusters, cluster==i)
-          layout_frame = subset(layout_frame, name %in% nodes_to_keep$node)
+          layout_frame = subset(layout_frame, name %in% V(graphNetwork_cluster)$name)
           layout_cluster = layout[layout_frame$rownumber,]
         }
         else {
@@ -377,8 +376,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 
         if (length(V(graphNetwork_cluster)) > 1) {
           layout_frame = data.frame(rownumber=seq(1,length(V(graphNetwork)$name)), name=V(graphNetwork)$name)
-          nodes_to_keep = subset(clustering_data$nodeclusters, cluster==i)
-          layout_frame = subset(layout_frame, name %in% nodes_to_keep$node)
+          layout_frame = subset(layout_frame, name %in% V(graphNetwork_cluster)$name)
           layout_cluster = layout[layout_frame$rownumber,]
         }
         else {
@@ -643,8 +641,7 @@ plot_cluster = function(network_input, cluster_number) {
 
     if (length(V(graphNetwork_cluster)) > 1) {
       layout_frame = data.frame(rownumber=seq(1,length(V(graphNetwork)$name)), name=V(graphNetwork)$name)
-      nodes_to_keep = subset(clustering_data$nodeclusters, cluster==i)
-      layout_frame = subset(layout_frame, name %in% nodes_to_keep$node)
+      layout_frame = subset(layout_frame, name %in% V(graphNetwork_cluster)$name)
       layout_cluster = layout[layout_frame$rownumber,]
     }
     else {
