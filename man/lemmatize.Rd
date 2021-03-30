@@ -4,10 +4,17 @@
 \alias{lemmatize}
 \title{Lemmatize Text}
 \usage{
-lemmatize(inputText, treetaggerDirectory, progressBar = TRUE)
+lemmatize(
+  inputText,
+  method = "direct",
+  treetaggerDirectory,
+  progressBar = TRUE
+)
 }
 \arguments{
 \item{inputText}{A character string or vector of character strings}
+
+\item{method}{Either 'direct' (which uses a predefined list of words and their lemmas) or 'treetagger' (which uses the software \code{TreeTagger}, implemented through the \code{koRpus} package)}
 
 \item{treetaggerDirectory}{the filepath to the location of your installation of the \code{treetagger} library (See Details below)}
 

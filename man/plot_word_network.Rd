@@ -26,7 +26,8 @@ plot_word_network(
   modelNodeSizeRange = c(5, 10),
   nodeLabelSize = 1,
   nodeLabelColor = "black",
-  plotTitle = NULL
+  plotTitle = NULL,
+  layout = NULL
 )
 }
 \arguments{
@@ -73,6 +74,8 @@ plot_word_network(
 \item{nodeLabelColor}{The color of the node labels. Defaults to "black".}
 
 \item{plotTitle}{The title of the plot(s). If a model is used, it must be a vector of three strings. If not, it must be a single string.}
+
+\item{layout}{An \code{igraph} layout object, helpful if you want to re-graph the same network multiple times with the same layout}
 }
 \value{
 A list containing the \code{igraph} network object, \code{igraph} layout, and clustering data (if applicable) - this can be used with the \code{plot_cluster} function, or graphed manually with the \code{igraph} package

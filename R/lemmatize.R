@@ -3,6 +3,7 @@
 #' @description This function performs lemmatization on input text by reducing words to their base units.
 #'
 #' @param inputText A character string or vector of character strings
+#' @param method Either 'direct' (which uses a predefined list of words and their lemmas) or 'treetagger' (which uses the software \code{TreeTagger}, implemented through the \code{koRpus} package)
 #' @param treetaggerDirectory the filepath to the location of your installation of the \code{treetagger} library (See Details below)
 #' @param progressBar Show a progress bar. Defaults to TRUE.
 #'
@@ -12,6 +13,7 @@
 #'
 #' @import koRpus.lang.en
 #' @importFrom koRpus treetag
+#' @importFrom quanteda corpus tokens tokens_replace
 #' @importFrom pbapply pblapply
 #' @importFrom rlang .data
 #'
@@ -37,9 +39,13 @@
 #' E.g. for the words "walked" and "dogs," both lemmatization and stemming would reduce the words to "walk" and "dog."
 #' However, stemming would ignore "ran" and "geese," while lemmatization would properly render these "run" and "goose."
 
-lemmatize = function(inputText, treetaggerDirectory, progressBar=TRUE) {
+lemmatize = function(inputText, method="direct", treetaggerDirectory, progressBar=TRUE) {
   if (!is.character(inputText)) {
     stop("The inputText argument needs to be a character string.")
+  }
+
+  if(!(method %in% c("direct", "treetagger"))) {
+    stop("The argument `method` must either be 'direct' or 'treetagger'.")
   }
 
   if (!dir.exists(treetaggerDirectory)) {
@@ -49,37 +55,46 @@ lemmatize = function(inputText, treetaggerDirectory, progressBar=TRUE) {
   if (!is.logical(progressBar)) {
     stop("The progressBar argument can only be TRUE or FALSE.")
   }
+  if (method == "treetagger") {
+    output_dataframe = data.frame(original_text = inputText, stringsAsFactors = FALSE)
+    if (progressBar) {
+      tagged = pblapply(inputText, function(x) {suppressWarnings(treetag(x, treetagger = "manual", format = "obj", TT.tknz=TRUE, lang="en", encoding="UTF-8", TT.options = list(path=treetaggerDirectory, preset="en")))})
+    }
+    else {
+      tagged = lapply(inputText, function(x) {suppressWarnings(treetag(x, treetagger = "manual", format = "obj", TT.tknz=TRUE, lang="en", encoding="UTF-8", TT.options = list(path=treetaggerDirectory, preset="en")))})
+    }
+    POS = lapply(tagged, function(x) {x@tokens$wclass})
 
-  output_dataframe = data.frame(original_text = inputText, stringsAsFactors = FALSE)
-  if (progressBar) {
-    tagged = pblapply(inputText, function(x) {suppressWarnings(treetag(x, treetagger = "manual", format = "obj", TT.tknz=TRUE, lang="en", encoding="UTF-8", TT.options = list(path=treetaggerDirectory, preset="en")))})
+    names(tagged) = seq(1,length(tagged), b=1)
+    correct_lemma = lapply(seq_along(tagged), function(i) {ifelse(tagged[[i]]@tokens$lemma=="<unknown>", tagged[[i]]@tokens$token, tagged[[i]]@tokens$lemma)})
+    correct_lemma_strings = lapply(correct_lemma, function(x) {paste(x, collapse = " ")})
+    output_dataframe$lemma_text = as.character(unlist(correct_lemma_strings))
+
+    output_dataframe$word_count = unlist(lapply(inputText, function(x) {sapply(strsplit(x, " "), length)}))
+    output_dataframe$noun_count = unlist(lapply(POS, function(x) {table(x)["noun"]}))
+    output_dataframe$noun_proportion = round(output_dataframe$noun_count / output_dataframe$word_count, 3)
+    output_dataframe$verb_count = unlist(lapply(POS, function(x) {table(x)["verb"]}))
+    output_dataframe$verb_proportion = round(output_dataframe$verb_count / output_dataframe$word_count, 3)
+    output_dataframe$adjective_count = unlist(lapply(POS, function(x) {table(x)["adjective"]}))
+    output_dataframe$adjective_proportion = round(output_dataframe$adjective_count / output_dataframe$word_count, 3)
+
+    output_dataframe$lemma_text = gsub("\\s+", " ", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("^\\s+|\\s+$", "", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\.", ".", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\,", ",", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\:", ":", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\;", ";", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\?", "?", output_dataframe$lemma_text)
+    output_dataframe$lemma_text = gsub("\\s+\\!", "!", output_dataframe$lemma_text)
+
+    return(output_dataframe)
   }
-  else {
-    tagged = lapply(inputText, function(x) {suppressWarnings(treetag(x, treetagger = "manual", format = "obj", TT.tknz=TRUE, lang="en", encoding="UTF-8", TT.options = list(path=treetaggerDirectory, preset="en")))})
+  else if (method == "direct") {
+    lemma_data = data("lemma_data")
+    lemma_text = inputText %>% corpus() %>% quanteda::tokens() %>% tokens_replace(lemma_data$inflected_form, lemma_data$lemma, valuetype = "fixed") %>% as.list()
+    lemma_text = lapply(token_text, function(x) paste(x, collapse = " "))
+
+    return(lemma_text)
   }
-  POS = lapply(tagged, function(x) {x@tokens$wclass})
 
-  names(tagged) = seq(1,length(tagged), b=1)
-  correct_lemma = lapply(seq_along(tagged), function(i) {ifelse(tagged[[i]]@tokens$lemma=="<unknown>", tagged[[i]]@tokens$token, tagged[[i]]@tokens$lemma)})
-  correct_lemma_strings = lapply(correct_lemma, function(x) {paste(x, collapse = " ")})
-  output_dataframe$lemma_text = as.character(unlist(correct_lemma_strings))
-
-  output_dataframe$word_count = unlist(lapply(inputText, function(x) {sapply(strsplit(x, " "), length)}))
-  output_dataframe$noun_count = unlist(lapply(POS, function(x) {table(x)["noun"]}))
-  output_dataframe$noun_proportion = round(output_dataframe$noun_count / output_dataframe$word_count, 3)
-  output_dataframe$verb_count = unlist(lapply(POS, function(x) {table(x)["verb"]}))
-  output_dataframe$verb_proportion = round(output_dataframe$verb_count / output_dataframe$word_count, 3)
-  output_dataframe$adjective_count = unlist(lapply(POS, function(x) {table(x)["adjective"]}))
-  output_dataframe$adjective_proportion = round(output_dataframe$adjective_count / output_dataframe$word_count, 3)
-
-  output_dataframe$lemma_text = gsub("\\s+", " ", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("^\\s+|\\s+$", "", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\.", ".", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\,", ",", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\:", ":", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\;", ";", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\?", "?", output_dataframe$lemma_text)
-  output_dataframe$lemma_text = gsub("\\s+\\!", "!", output_dataframe$lemma_text)
-
-  return(output_dataframe)
 }

@@ -61,3 +61,18 @@
 #' }
 #' @source \url{http://ai.stanford.edu/~amaas/data/sentiment/}
 "mild_movie_review_data"
+
+
+#' Lemma Data
+#'
+#' A dataset containing inflected and base forms of text, used for the \code{lemmatize} function.
+#'
+#' @docType data
+#'
+#' @format A data frame with 47,366 rows and 2 variables:
+#' \describe{
+#'   \item{inflected_form}{the original, inflected word (e.g. 'dogs' or 'walked')}
+#'   \item{lemma}{the base form of the word (e.g. 'dog' or 'walk')}
+#' }
+#' @source \url{https://github.com/tm4ss/tm4ss.github.io/blob/master/resources/baseform_en.tsv}
+"lemma_data"
