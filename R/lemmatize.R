@@ -95,6 +95,7 @@ lemmatize = function(inputText, method="direct", treetaggerDirectory=NULL, progr
     data("lemma_data")
     lemma_text = inputText %>% corpus() %>% quanteda::tokens() %>% tokens_replace(lemma_data$inflected_form, lemma_data$lemma, valuetype = "fixed") %>% as.list()
     lemma_text = lapply(lemma_text, function(x) paste(x, collapse = " "))
+    lemma_text = unlist(lemma_text)
 
     return(lemma_text)
   }
