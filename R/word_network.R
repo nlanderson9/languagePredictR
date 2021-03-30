@@ -57,6 +57,12 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
   resultGraph = input_sorted[1:topX,]
 
   if(clusterType=="edge") {
+
+    all_inputs = c(resultGraph$first, resultGraph$second)
+    all_inputs_table = table(all_inputs)
+    inputs_1 = all_inputs_table[all_inputs_table < removeVerticesBelowDegree]
+    resultGraph = subset(resultGraph, !(first %in% names(inputs_1)) & !(second %in% names(inputs_1)))
+
     clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))), plot=FALSE, verbose=FALSE)
     clustering_table = clustering_data$edges
     num_clusters = max(as.numeric(clustering_table$cluster))
@@ -129,10 +135,11 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     }
   }
 
-  # Remove nodes that have few connections
-  verticesToRemove = V(graphNetwork)[degree(graphNetwork) < removeVerticesBelowDegree]
-  graphNetwork = delete.vertices(graphNetwork, verticesToRemove)
-
+  if (clusterType != "edge") {
+    # Remove nodes that have few connections
+    verticesToRemove = V(graphNetwork)[degree(graphNetwork) < removeVerticesBelowDegree]
+    graphNetwork = delete.vertices(graphNetwork, verticesToRemove)
+  }
 
   if (clusterType == "node"){
     if (clusterNodeMethod=="edge_betweenness") {
