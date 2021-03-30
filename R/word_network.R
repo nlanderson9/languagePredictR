@@ -443,10 +443,10 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     return(list(network_object = graphNetwork, layout_object = layout, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
   }
   else if (clusterType == "node") {
-    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = result, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
+    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = result, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize, num_clusters=num_clusters)))
   }
   else if (clusterType == "edge") {
-    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = clustering_data, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize)))
+    return(list(network_object = graphNetwork, layout_object = layout, cluster_object = clustering_data, parameters = list(edgeColor=edgeColor, edgeAlpha=edgeAlpha, nodeLabelColor=nodeLabelColor, nodeLabelSize=nodeLabelSize, num_clusters=num_clusters)))
   }
 }
 
