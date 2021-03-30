@@ -39,7 +39,7 @@
 #' E.g. for the words "walked" and "dogs," both lemmatization and stemming would reduce the words to "walk" and "dog."
 #' However, stemming would ignore "ran" and "geese," while lemmatization would properly render these "run" and "goose."
 
-lemmatize = function(inputText, method="direct", treetaggerDirectory, progressBar=TRUE) {
+lemmatize = function(inputText, method="direct", treetaggerDirectory=NULL, progressBar=TRUE) {
   if (!is.character(inputText)) {
     stop("The inputText argument needs to be a character string.")
   }
@@ -48,8 +48,10 @@ lemmatize = function(inputText, method="direct", treetaggerDirectory, progressBa
     stop("The argument `method` must either be 'direct' or 'treetagger'.")
   }
 
-  if (!dir.exists(treetaggerDirectory)) {
-    stop("You must provide a valid directory path pointing to your installation of TreeTagger. If you haven't installed TreeTagger yet, you can find instructions here: https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/")
+  if (method == "treetagger") {
+    if (is.null(treetaggerDirectory) | !dir.exists(treetaggerDirectory)) {
+      stop("You must provide a valid directory path pointing to your installation of TreeTagger. If you haven't installed TreeTagger yet, you can find instructions here: https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/")
+    }
   }
 
   if (!is.logical(progressBar)) {
