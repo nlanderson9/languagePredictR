@@ -153,13 +153,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
         }
       }
 
-      if (still_no_cluster) {
-        num_clusters = length(current_clusters) - 1
-      }
-      else {
-        num_clusters = length(current_clusters)
-      }
-
+      num_clusters = length(current_clusters)
       cluster_levels = seq(from=1, to=num_clusters, by=1)
       cluster_colors = hue_pal()(num_clusters)
       cluster_lty = rep(1, num_clusters)
