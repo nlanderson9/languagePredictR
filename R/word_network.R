@@ -131,6 +131,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
   }
 
   if (!plotNodeColors) {
+    V(graphNetwork)$size = 1
     V(graphNetwork)$color = "gray"
   }
 
