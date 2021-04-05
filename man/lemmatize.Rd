@@ -7,7 +7,7 @@
 lemmatize(
   inputText,
   method = "direct",
-  treetaggerDirectory,
+  treetaggerDirectory = NULL,
   progressBar = TRUE
 )
 }
