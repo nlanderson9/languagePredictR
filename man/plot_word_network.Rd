@@ -19,6 +19,7 @@ plot_word_network(
   plotIndividualClusters = TRUE,
   plotIndividualClusterFacet = TRUE,
   plotClusterLegend = TRUE,
+  plotNodeColors = TRUE,
   edgeColor = "darkgray",
   edgeAlpha = 0.5,
   edgeCurve = 0.15,
@@ -58,6 +59,8 @@ plot_word_network(
 \item{plotIndividualClusterFacet}{If TRUE, each cluster is plotted in a faceted section of a single graph. Defaults to TRUE.}
 
 \item{plotClusterLegend}{If TRUE, plots a legend with cluster numbers and corresponding colors. Defaults to TRUE.}
+
+\item{plotNodeColors}{If TRUE, nodes are colored in based on the model provided.}
 
 \item{edgeColor}{The color of the edges. Default is "darkgray".}
 
