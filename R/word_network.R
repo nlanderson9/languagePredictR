@@ -55,7 +55,12 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
     arrange(desc(cooc_count))
 
   # Keep only the topX items
-  resultGraph = input_sorted[1:topX,]
+  if (!is.null(topX)) {
+    resultGraph = input_sorted[1:topX,]
+  }
+  else {
+    resultGraph = input_sorted
+  }
 
   if(clusterType=="edge") {
     clustering_data = getLinkCommunities(as.matrix(subset(resultGraph, select = c(first, second, weight))), plot=FALSE, verbose=FALSE)
@@ -453,7 +458,7 @@ make_word_network = function(input_node_edge_table, model=NULL, topX=100, direct
 #'
 #' @param input An input dataframe, typically the output from the \code{node_edge} function
 #' @param model Optional - if \code{node_edge} used a model as input, the same model can be provided here for extra functionality
-#' @param topX The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.
+#' @param topX The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100. If NULL, all pairs will be used.
 #' @param graphIndividual If TRUE, individual graphs are produced for both outcomes of the model. Default is TRUE.
 #' @param graphCombined If TRUE, a network is graphed based on the entire language corpus. Default is FALSE.
 #' @param directed Determines if the network is directed (direction of edges matters) or not. Defaults to FALSE (the output from \code{node_edge} does not yield directional edge information, so only change this if using your own dataframe).

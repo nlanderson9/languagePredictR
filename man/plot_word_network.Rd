@@ -36,7 +36,7 @@ plot_word_network(
 
 \item{model}{Optional - if \code{node_edge} used a model as input, the same model can be provided here for extra functionality}
 
-\item{topX}{The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100.}
+\item{topX}{The number of word pairs to include in the graphed network. Chosen word pairs are selected from those with the greatest number of co-occurrences. Defaults to 100. If NULL, all pairs will be used.}
 
 \item{graphIndividual}{If TRUE, individual graphs are produced for both outcomes of the model. Default is TRUE.}
 
