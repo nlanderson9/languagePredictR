@@ -62,6 +62,19 @@
 #' @source \url{http://ai.stanford.edu/~amaas/data/sentiment/}
 "mild_movie_review_data"
 
+#' Contraction Data
+#'
+#' A dataset containing versions of contractions to be used with \code{textclean} that don't contain apostrophes (e.g. it will still convert "dont" to "do not").
+#'
+#' @docType data
+#'
+#' @format A data frame with 140 rows and 2 variables:
+#' \describe{
+#'   \item{contraction}{the original contraction (e.g. "don't" or "dont")}
+#'   \item{expanded}{the expanded form (e.g. "do not")}
+#' }
+#' @source \url{https://github.com/trinker/lexicon/blob/master/data/key_contractions.rda}
+"key_contractions_addl"
 
 #' Lemma Data
 #'

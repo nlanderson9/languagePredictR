@@ -39,7 +39,7 @@ clean_text = function(inputText, replaceSymbol=FALSE, replaceNumber=FALSE, remov
     stop("The inputText argument needs to be a character string.")
   }
 
-  new_text = replace_contraction(inputText)
+  new_text = replace_contraction(inputText, contraction.key = key_contractions_addl)
   new_text = replace_non_ascii(new_text)
   if (replaceSymbol) {
     new_text = replace_symbol(new_text)
