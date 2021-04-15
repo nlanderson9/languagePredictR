@@ -94,8 +94,8 @@ analyze_roc = function(..., plot=TRUE, plot_diagonal=FALSE) {
 
 
 
-  auc_tests = data.frame(matrix(ncol=5,nrow=0))
-  colnames(auc_tests) = c("model1", "model2", "model1_auc", "model2_auc", "p_value")
+  auc_tests = data.frame(matrix(ncol=6,nrow=0))
+  colnames(auc_tests) = c("model1", "model2", "model1_auc", "model2_auc", "Z", "p_value")
 
 
   for (i in 1:length(roc_list)) {
@@ -110,8 +110,8 @@ analyze_roc = function(..., plot=TRUE, plot_diagonal=FALSE) {
       }
       model1_auc = roc_list[[i]]$auc
       model2_auc = roc_list[[j]]$auc
-      p_value = roc.test(roc_list[[i]], roc_list[[j]])
-      temp_frame = data.frame(model1=model1, model2=model2, model1_auc=model1_auc, model2_auc=model2_auc, p_value=p_value$p.value)
+      test_output = roc.test(roc_list[[i]], roc_list[[j]])
+      temp_frame = data.frame(model1=model1, model2=model2, model1_auc=model1_auc, model2_auc=model2_auc, Z=test_output$statistic, p_value=test_output$p.value)
       auc_tests = rbind(auc_tests, temp_frame)
     }
   }
@@ -129,7 +129,7 @@ analyze_roc = function(..., plot=TRUE, plot_diagonal=FALSE) {
 
   if (plot_diagonal) {
     auc_tests2 = auc_tests
-    colnames(auc_tests2) = c("model2", "model1", "model2_auc", "model1_auc", "p_value", "sig_TF", "font", "size", "width", "height", "sig")
+    colnames(auc_tests2) = c("model2", "model1", "model2_auc", "model1_auc", "Z", "p_value", "sig_TF", "font", "size", "width", "height", "sig")
     auc_tests = rbind(auc_tests, auc_tests2)
   }
 
