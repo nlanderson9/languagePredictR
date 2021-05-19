@@ -175,7 +175,7 @@ draw_key_polygon4 = function(data, params, size) {
   grid::rectGrob(width = grid::unit(.6, "npc"),
                  height = grid::unit(.6, "npc"),
                  gp = grid::gpar(col = data$colour %||% NA,
-                                 fill = alpha(data$fill %||% "grey20", data$alpha),
+                                 fill = scales::alpha(data$fill %||% "grey20", data$alpha),
                                  lty = data$linetype %||% 1,
                                  lwd = lwd * .pt,
                                  linejoin = params$linejoin %||% "mitre",
@@ -203,8 +203,8 @@ draw_key_path4 = function (data, params, size) {
                      y0 = grid::unit(.5, "npc"),
                      x1 = grid::unit(.68, "npc"),
                      y1 = grid::unit(.5, "npc"),
-                     gp = grid::gpar(col = alpha(data$colour %||% data$fill %||% "black", data$alpha),
-                                     fill = alpha(params$arrow.fill %||% data$colour %||% data$fill %||% "black", data$alpha),
+                     gp = grid::gpar(col = scales::alpha(data$colour %||% data$fill %||% "black", data$alpha),
+                                     fill = scales::alpha(params$arrow.fill %||% data$colour %||% data$fill %||% "black", data$alpha),
                                      lwd = (data$size %||% 0.5) * .pt, lty = data$linetype %||% 1, lineend = "butt"),
                      arrow = params$arrow)
 }
