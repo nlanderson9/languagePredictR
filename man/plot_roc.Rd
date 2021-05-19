@@ -23,7 +23,8 @@ plot_roc(
   plot_legend = TRUE,
   plot_title,
   facet_n_row = NULL,
-  facet_n_col = 2
+  facet_n_col = 2,
+  legend_spacing = FALSE
 )
 }
 \arguments{
@@ -64,6 +65,8 @@ plot_roc(
 \item{facet_n_row}{The number of rows used to plot the facet_plot. Defaults to NULL.}
 
 \item{facet_n_col}{The number of columns used to plot the facet_plot. Defaults to 2.}
+
+\item{legend_spacing}{If TRUE, there will be spacing between the legend items. Defaults to FALSE.}
 }
 \value{
 Nothing (this function plots a series of graphs)

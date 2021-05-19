@@ -11,7 +11,7 @@ To install:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")
-devtools::install_github("nlanderson9/languagePredictR")
+# devtools::install_github("nlanderson9/languagePredictR")
 ```
 
 ```{r}
@@ -123,6 +123,6 @@ What do these words mean in context? We can investigate with the network plottin
 network_table = node_edge(movie_model_strong, removeStopwords = TRUE)
 ```
 ```{r}
-word_network(network_table, model=movie_model_strong, topX=50)
+plot_word_network(network_table, model=movie_model_strong, topX=150)
 ```
 

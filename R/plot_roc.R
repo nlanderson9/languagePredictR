@@ -21,6 +21,7 @@
 #' @param plot_title The title of the plot
 #' @param facet_n_row The number of rows used to plot the facet_plot. Defaults to NULL.
 #' @param facet_n_col The number of columns used to plot the facet_plot. Defaults to 2.
+#' @param legend_spacing If TRUE, there will be spacing between the legend items. Defaults to FALSE.
 #'
 #' @return Nothing (this function plots a series of graphs)
 #'
@@ -59,7 +60,7 @@
 #' plot_roc(movie_model_strong, movie_model_mild)
 #' }
 
-plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TRUE, facet_summary=TRUE, colors, model_names, plot_auc_polygon=TRUE, plot_ci=TRUE, line_size=1, print_auc=TRUE, print_ci=TRUE, print_auc_ci_font_size=4, print_auc_ci_x, print_auc_ci_y, plot_legend=TRUE, plot_title, facet_n_row=NULL, facet_n_col=2) {
+plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TRUE, facet_summary=TRUE, colors, model_names, plot_auc_polygon=TRUE, plot_ci=TRUE, line_size=1, print_auc=TRUE, print_ci=TRUE, print_auc_ci_font_size=4, print_auc_ci_x, print_auc_ci_y, plot_legend=TRUE, plot_title, facet_n_row=NULL, facet_n_col=2, legend_spacing=FALSE) {
 
   facet=model=polygon.x=polygon.y=specificities=sensitivities=percent2p5=percent97p5=label_text=x=y=NULL
 
@@ -222,10 +223,21 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
 
 
       if(plot_ci) {
-        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=this_color, color=this_color, alpha=.4, size=.4)
+        if(!legend_spacing) {
+          p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=this_color, color=this_color, alpha=.4, size=.4)
+        }
+        else {
+          p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=this_color, color=this_color, alpha=.4, size=.4, key_glyph="polygon4")
+        }
+
       }
 
-      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=this_color, size=line_size)
+      if(!legend_spacing) {
+        p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=this_color, size=line_size)
+      }
+      else {
+        p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=this_color, size=line_size, key_glyph="path4")
+      }
 
       p = p + geom_segment(aes(x=1, xend=0, y=0, yend=1), linetype="dashed")
 
@@ -317,10 +329,21 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
     }
 
     if(plot_ci) {
-      p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4)
+      if(!legend_spacing) {
+        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=model, color=model, alpha=.4, size=.4)
+      }
+      else {
+        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=model, color=model, alpha=.4, size=.4, key_glyph="polygon4")
+      }
+
     }
 
-    p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size)
+    if(!legend_spacing) {
+      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=model, size=line_size)
+    }
+    else {
+      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=model, size=line_size, key_glyph="path4")
+    }
 
     p = p + geom_segment(aes(x=1, xend=0, y=0, yend=1), linetype="dashed")
 
@@ -437,10 +460,21 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
     }
 
     if(plot_ci) {
-      q = q + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4)
+      if(!legend_spacing) {
+        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=model, color=model, alpha=.4, size=.4)
+      }
+      else {
+        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities), fill=model, color=model, alpha=.4, size=.4, key_glyph="polygon4")
+      }
+
     }
 
-    q = q + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size)
+    if(!legend_spacing) {
+      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=model, size=line_size)
+    }
+    else {
+      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities), color=model, size=line_size, key_glyph="path4")
+    }
 
     q = q + geom_segment(aes(x=1, xend=0, y=0, yend=1), linetype="dashed")
 

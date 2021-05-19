@@ -141,3 +141,49 @@ CreateAllFacet <- function(df, col){
 
   return(merged)
 }
+
+
+#' Allows for spacing between legend items in a vertical ggplot graph
+#' @param data The data
+#' @param params The parameters
+#' @param size The size
+#' @noRd
+
+draw_key_polygon4 = function(data, params, size) {
+  if (is.null(data$size)) {
+    data$size <- 0.5
+  }
+  lwd <- min(data$size, min(size)/4)
+  grid::rectGrob(width = grid::unit(.6, "npc"),
+                 height = grid::unit(.6, "npc"),
+                 gp = grid::gpar(col = data$colour %||% NA,
+                                 fill = alpha(data$fill %||% "grey20", data$alpha),
+                                 lty = data$linetype %||% 1,
+                                 lwd = lwd * .pt,
+                                 linejoin = params$linejoin %||% "mitre",
+                                 lineend = if (identical(params$linejoin, "round")) "round" else "square")
+  )
+}
+
+#' Allows for spacing between legend items in a vertical ggplot graph
+#' @param data The data
+#' @param params The parameters
+#' @param size The size
+#' @noRd
+
+draw_key_path4 = function (data, params, size) {
+  if (is.null(data$linetype)) {
+    data$linetype <- 0
+  }
+  else {
+    data$linetype[is.na(data$linetype)] <- 0
+  }
+  grid::segmentsGrob(x0 = unit(.32, "npc"),
+                     y0 = grid::unit(.5, "npc"),
+                     x1 = grid::unit(.68, "npc"),
+                     y1 = grid::unit(.5, "npc"),
+                     gp = grid::gpar(col = alpha(data$colour %||% data$fill %||% "black", data$alpha),
+                                     fill = alpha(params$arrow.fill %||% data$colour %||% data$fill %||% "black", data$alpha),
+                                     lwd = (data$size %||% 0.5) * .pt, lty = data$linetype %||% 1, lineend = "butt"),
+                     arrow = params$arrow)
+}
