@@ -147,6 +147,9 @@ CreateAllFacet <- function(df, col){
 #' @param data The data
 #' @param params The parameters
 #' @param size The size
+#'
+#' @import rlang
+#'
 #' @noRd
 
 draw_key_polygon4 = function(data, params, size) {
@@ -169,6 +172,9 @@ draw_key_polygon4 = function(data, params, size) {
 #' @param data The data
 #' @param params The parameters
 #' @param size The size
+#'
+#' @import rlang
+#'
 #' @noRd
 
 draw_key_path4 = function (data, params, size) {

@@ -461,19 +461,19 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
 
     if(plot_ci) {
       if(!legend_spacing) {
-        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4)
+        q = q + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4)
       }
       else {
-        p = p + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4, key_glyph="polygon4")
+        q = q + geom_ribbon(data=roc_ci_df, aes(xmin=percent2p5, xmax=percent97p5, y=sensitivities, fill=model, color=model), alpha=.4, size=.4, key_glyph="polygon4")
       }
 
     }
 
     if(!legend_spacing) {
-      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size)
+      q = q + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size)
     }
     else {
-      p = p + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size, key_glyph="path4")
+      q = q + geom_line(data=roc_curve_df, aes(x=specificities, y=sensitivities, color=model), size=line_size, key_glyph="path4")
     }
 
     q = q + geom_segment(aes(x=1, xend=0, y=0, yend=1), linetype="dashed")
