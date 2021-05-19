@@ -163,7 +163,7 @@ CreateAllFacet <- function(df, col){
 #' @param params The parameters
 #' @param size The size
 #'
-#' @importFrom scales alpha
+#' @import scales
 #'
 #' @noRd
 
@@ -188,7 +188,7 @@ draw_key_polygon4 = function(data, params, size) {
 #' @param params The parameters
 #' @param size The size
 #'
-#' @importFrom scales alpha
+#' @import scales
 #'
 #' @noRd
 

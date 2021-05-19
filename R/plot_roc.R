@@ -27,8 +27,7 @@
 #'
 #' @seealso \code{\link{language_model}}, \code{\link{comparison_model}}, \code{\link{test_language_model}}
 #'
-#' @import ggplot2
-#' @importFrom scales hue_pal alpha
+#' @import ggplot2 scales
 #' @importFrom rlang .data
 #'
 #' @export
