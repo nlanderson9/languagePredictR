@@ -3,6 +3,7 @@
 S3method(summary,compModel)
 S3method(summary,langModel)
 S3method(summary,testAssessment)
+export("%||%")
 export(analyze_roc)
 export(assess_models)
 export(check_spelling)

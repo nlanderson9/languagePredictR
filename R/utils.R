@@ -147,11 +147,13 @@ CreateAllFacet <- function(df, col){
 #' @param params The parameters
 #' @param size The size
 #'
+#' @export
+#'
 #' @noRd
 
 `%||%` = function (x, y)
 {
-  if (is_null(x))
+  if (is.null(x))
     y
   else x
 }
