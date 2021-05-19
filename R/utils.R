@@ -173,8 +173,8 @@ draw_key_polygon4 = function(data, params, size) {
     data$size <- 0.5
   }
   lwd <- min(data$size, min(size)/4)
-  grid::rectGrob(width = grid::unit(.6, "npc"),
-                 height = grid::unit(.6, "npc"),
+  grid::rectGrob(width = grid::unit(.5, "npc"),
+                 height = grid::unit(.5, "npc"),
                  gp = grid::gpar(col = data$colour %||% NA,
                                  fill = scales::alpha(data$fill %||% "grey20", data$alpha),
                                  lty = data$linetype %||% 1,
