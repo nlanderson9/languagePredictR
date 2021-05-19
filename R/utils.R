@@ -142,13 +142,24 @@ CreateAllFacet <- function(df, col){
   return(merged)
 }
 
-
 #' Allows for spacing between legend items in a vertical ggplot graph
 #' @param data The data
 #' @param params The parameters
 #' @param size The size
 #'
-#' @import rlang
+#' @noRd
+
+`%||%` = function (x, y)
+{
+  if (is_null(x))
+    y
+  else x
+}
+
+#' Allows for spacing between legend items in a vertical ggplot graph
+#' @param data The data
+#' @param params The parameters
+#' @param size The size
 #'
 #' @noRd
 
@@ -172,8 +183,6 @@ draw_key_polygon4 = function(data, params, size) {
 #' @param data The data
 #' @param params The parameters
 #' @param size The size
-#'
-#' @import rlang
 #'
 #' @noRd
 
