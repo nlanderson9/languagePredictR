@@ -306,6 +306,12 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
       }
 
 
+      if(legend_spacing) {
+        p = p + theme(legend.key = element_rect(color = NA, fill = NA),
+                      legend.key.size = unit(.8, "cm"))
+      }
+
+
       plot(p)
     }
 
@@ -428,6 +434,12 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
       }
       p = p + scale_fill_discrete(labels=model_names)
       p = p + scale_color_discrete(labels=model_names)
+    }
+
+
+    if(legend_spacing) {
+      p = p + theme(legend.key = element_rect(color = NA, fill = NA),
+                    legend.key.size = unit(.8, "cm"))
     }
 
 
@@ -566,6 +578,11 @@ plot_roc = function(..., individual_plot=TRUE, combined_plot=TRUE, facet_plot=TR
       }
       q = q + scale_fill_discrete(labels=model_names)
       q = q + scale_color_discrete(labels=model_names)
+    }
+
+    if(legend_spacing) {
+      q = q + theme(legend.key = element_rect(color = NA, fill = NA),
+                    legend.key.size = unit(.8, "cm"))
     }
 
 
