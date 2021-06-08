@@ -252,7 +252,7 @@ plot_predictor_words = function(..., topX, colors=c("blue", "orange"), plot_titl
     height_vector = c()
     for(i in 1:nrow(model_labels)) {
       if(!missing(model_names)) {
-        label_vector = c(label_vector, "", "", model_names$name[i], "")
+        label_vector = c(label_vector, "", "", model_names[i], "")
       }
       else {
         label_vector = c(label_vector, "", "", model_labels$name[i], "")
